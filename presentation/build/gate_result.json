@@ -1,11 +1,11 @@
 {
   "passed": true,
-  "overall_score": 96,
+  "overall_score": 97,
   "pptx_path": "presentation/build/photonic-pde-draft.pptx",
   "checklist": {
     "user_code_errors": 0,
     "engine_bug_errors": 0,
-    "warnings": 19
+    "warnings": 13
   },
   "verdict": "PASS — 可进入 S5 交付",
   "user_code_error_detail": [],
@@ -15,16 +15,6 @@
       "slide": 1,
       "category": "text_overflow",
       "message": "Text likely overflows box by ~22%"
-    },
-    {
-      "slide": 4,
-      "category": "text_overflow",
-      "message": "Text likely overflows box by ~26%"
-    },
-    {
-      "slide": 4,
-      "category": "text_overflow",
-      "message": "Text likely overflows box by ~19%"
     },
     {
       "slide": 5,
@@ -43,21 +33,6 @@
     },
     {
       "slide": 9,
-      "category": "shape_overlap",
-      "message": "Two text shapes overlap by 47%"
-    },
-    {
-      "slide": 9,
-      "category": "shape_overlap",
-      "message": "Two text shapes overlap by 47%"
-    },
-    {
-      "slide": 10,
-      "category": "text_overflow",
-      "message": "Text likely overflows box by ~28%"
-    },
-    {
-      "slide": 11,
       "category": "text_overflow",
       "message": "Text likely overflows box by ~22%"
     },
@@ -90,11 +65,6 @@
       "slide": 19,
       "category": "text_overflow",
       "message": "Text likely overflows box by ~26%"
-    },
-    {
-      "slide": 21,
-      "category": "shape_overlap",
-      "message": "Two text shapes overlap by 20%"
     },
     {
       "slide": 26,

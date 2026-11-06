@@ -12,38 +12,49 @@ from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION, XL_TICK_MARK
 from pptx.chart.data import CategoryChartData, XyChartData
 from pptx.oxml.xmlchemy import OxmlElement
 import numpy as np
+from equation_style import equation, is_formula
 
 WEB=json.loads((BASE/'research/web-data.json').read_text()); D=WEB['data']; RUN=WEB['runs']['zero']
 MAIN=json.loads((BASE/'research/main-data.json').read_text()); DER=json.loads((BASE/'research/derived.json').read_text())
 NAVY='132D40'; TEAL='087E83'; AMBER='B87510'; PURPLE='77629B'; GRAY='526574'; LIGHT='E7ECEF'; WHITE='FFFFFF'; INK='172C3B'; RED='B14B49'
-FONT='Carlito'; MATH='DejaVu Sans'
+FONT='Carlito'; MATH='STIXGeneral'
 LEE='https://arxiv.org/pdf/2511.01005'
 ZHU='https://doi.org/10.1021/acsphotonics.3c01694'
 WEB_SRC='web/index.html: PhotonicSolver numerical core and embedded sparse matrix data'
 MAIN_SRC='main.py: original solver, observed by presentation/build/collect_python.py'
-ENG=MckEngine(total_slides=32); PRS=ENG.prs
+ENG=MckEngine(total_slides=35); PRS=ENG.prs
 META=[]
 
 def rgb(c):return RGBColor.from_string(c)
 def text(sl,x,y,w,h,s,size=20,color=INK,bold=False,align=PP_ALIGN.LEFT,font=FONT):
+    parts=str(s).split('\n')
+    if len(parts)>1 and 'Mono' not in font and any(is_formula(v) for v in parts):
+        for i,part in enumerate(parts):
+            last=text(sl,x,y+i*h/len(parts),w,h/len(parts),part,size,color,bold,align,font)
+        return last
     sh=sl.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
     tf=sh.text_frame;tf.clear();tf.word_wrap=True
     tf.margin_left=tf.margin_right=Inches(.015);tf.margin_top=tf.margin_bottom=0
-    for i,line in enumerate(str(s).split('\n')):
-        p=tf.paragraphs[0] if i==0 else tf.add_paragraph();p.text=line;p.alignment=align
-        p.font.name=font;p.font.size=Pt(size);p.font.bold=bold;p.font.color.rgb=rgb(color)
-        p.space_after=Pt(5);p.space_before=Pt(0)
+    lines=str(s).split('\n')
+    for i,line in enumerate(lines):
+        p=tf.paragraphs[0] if i==0 else tf.add_paragraph();p.alignment=align
+        use_math='Mono' not in font and is_formula(line)
+        p.text='' if use_math else line
+        p.font.name=FONT if font==MATH else font;p.font.size=Pt(size);p.font.bold=bold;p.font.color.rgb=rgb(color)
+        p.space_after=Pt(3);p.space_before=Pt(0)
+        if use_math:equation(sl,x,y+i*h/len(lines),w,h/len(lines),line,size,color,'center' if align==PP_ALIGN.CENTER else 'left')
     return sh
 
 def shape(sl,x,y,w,h,label='',fill=WHITE,line=TEAL,size=19,kind=MSO_SHAPE.ROUNDED_RECTANGLE,color=INK,bold=False):
     sh=sl.shapes.add_shape(kind,Inches(x), Inches(y), Inches(w), Inches(h));sh.name='Flow: '+label[:45]
-    sh.fill.solid();sh.fill.fore_color.rgb=rgb(fill);sh.line.color.rgb=rgb(line);sh.line.width=Pt(1.4)
+    sh.fill.solid();sh.fill.fore_color.rgb=rgb(fill);sh.line.color.rgb=rgb(line);sh.line.width=Pt(1.0)
     if kind==MSO_SHAPE.ROUNDED_RECTANGLE:
         sh.adjustments[0]=.06
     tf=sh.text_frame;tf.clear();tf.word_wrap=True;tf.vertical_anchor=MSO_ANCHOR.MIDDLE
     tf.margin_left=tf.margin_right=Inches(.09);tf.margin_top=tf.margin_bottom=Inches(.03)
     for i,l in enumerate(label.split('\n')):
-        p=tf.paragraphs[0] if i==0 else tf.add_paragraph();p.text=l;p.alignment=PP_ALIGN.CENTER
+        p=tf.paragraphs[0] if i==0 else tf.add_paragraph();p.text='' if is_formula(l) else l;p.alignment=PP_ALIGN.CENTER
+        if is_formula(l):equation(sl,x+.14,y+.06+i*(h-.12)/len(label.split('\n')),w-.28,(h-.12)/len(label.split('\n')),l,size,color,'center')
         p.font.name=FONT;p.font.size=Pt(size);p.font.color.rgb=rgb(color);p.font.bold=bold
         p.space_after=Pt(2)
     return sh
@@ -69,20 +80,18 @@ def tag(sl,s,x=.6,y=1.22,w=11.9,c=GRAY):text(sl,x,y,w,.34,s,14,c)
 def note(sl,s,x=.6,y=6.4,w=11.9,size=18,c=INK):text(sl,x,y,w,.78,s,size,c)
 
 def mini(sl,active):
-    labels=['Residual check','PCG correction','V-cycle','Optical product']
-    for i,l in enumerate(labels):
-        x=.6+i*3.05
-        text(sl,x,1.22,2.8,.32,f'{i+1}  {l}',14,AMBER if i==active else GRAY,bold=i==active)
-        if i<3:line(sl,x+2.57,1.37,x+2.92,1.37,LIGHT,1)
+    labels=['True residual check','PCG correction','Multigrid V-cycle','Optical smoothing']
+    text(sl,.65,1.23,11.9,.3,labels[active],14,TEAL,bold=True)
 
 def new(title,source,notes='',stage=None,subtitle=None,layout='side_by_side',appendix=False):
     sl=ENG._ns();sl.background.fill.solid();sl.background.fill.fore_color.rgb=rgb(WHITE)
     n=len(PRS.slides)
-    text(sl,.58,.35,12.1,.78,title,31,NAVY,True)
+    text(sl,.65,.34,12.0,.66,title,29,NAVY,True)
     line(sl,.6,1.08,12.7,1.08,LIGHT,1,False)
     if stage is not None:mini(sl,stage)
     elif subtitle:tag(sl,subtitle)
-    text(sl,.6,7.26,11.5,.23,('Appendix  ·  ' if appendix else '')+source,10,GRAY)
+    footer=source.replace(WEB_SRC,'Browser solver').replace(MAIN_SRC,'main.py · recorded numerical run')
+    text(sl,.65,7.22,11.0,.22,('Technical appendix  /  ' if appendix else '')+footer,9,GRAY)
     text(sl,12.1,7.22,.6,.26,str(n),12,GRAY,align=PP_ALIGN.RIGHT)
     sl.notes_slide.notes_text_frame.text=notes+'\n\nSources: '+source
     META.append(dict(idx=n,title=title,layout=layout,source=source,notes=notes,appendix=appendix))
@@ -99,6 +108,7 @@ def table(sl,headers,rows,x=.6,y=1.85,w=12.05,h=4.2,widths=None,size=19):
             cell.fill.solid();cell.fill.fore_color.rgb=rgb(NAVY if i==0 else ('F3F6F7' if i%2 else WHITE))
             for p in cell.text_frame.paragraphs:
                 p.font.name=FONT;p.font.size=Pt(size);p.font.bold=i==0;p.font.color.rgb=rgb(WHITE if i==0 else INK)
+                if i>0 and j>0 and str(v).replace('-','').replace('.','').replace(',','').isdigit():p.alignment=PP_ALIGN.RIGHT
     return tb
 
 def chart(sl,series,x,y,w,h,xlabel='',ylabel='',log=False,kind='line'):
@@ -201,7 +211,8 @@ note(s,'Main explanation: browser’s 1D model. Research evidence: main.py’s s
 # 4
 s=new('The unknown vector stores sampled solution values', WEB_SRC,
       'The teaching problem is a 1D Poisson boundary-value problem, mathematically an ODE reduction of the PDE. Interior unknowns only are in x. Known boundaries enter b. h=1/65. The analytic quadratic is also the exact discrete solution for this stencil up to floating-point error. Its samples are a reference, never solver input.',subtitle='Ideal 1D teaching model')
-text(s,.65,1.82,6.1,.8,'−u″(t) = 1\nu(0) = 100,   u(1) = 0',26,NAVY,font=MATH)
+equation(s,.65,1.85,6.1,.66,'−u″(t) = 1',30,NAVY)
+equation(s,.65,2.58,6.1,.42,'u(0) = 100,   u(1) = 0',25,NAVY)
 text(s,.65,3.05,6.1,1.0,'(2xᵢ − xᵢ₋₁ − xᵢ₊₁) / h² = 1\nh = 1 / 65,   x ∈ ℝ⁶⁴',23,INK,font=MATH)
 text(s,.65,4.4,6.1,.75,'A₀ = h⁻² tridiag(−1, 2, −1)\nb = [422501, 1, …, 1]ᵀ',23,TEAL,font=MATH)
 tt=[0]+[(i+1)/65 for i in range(64)]+[1];xx=[100]+D['exact']+[0]
@@ -216,7 +227,7 @@ text(s,.7,2.85,5.6,.8,'A₀(x* − x) = r',30,NAVY,font=MATH)
 text(s,.7,4.0,5.6,1.3,'Find δ with A₀δ ≈ r\nThen xnew = x + δ',28,INK,font=MATH)
 shape(s,7.15,1.95,5.05,.8,'Known: A₀, b, current x',line=TEAL,size=23)
 shape(s,7.15,3.25,5.05,1.1,'Solve for a correction δ\nwhile current x stays in memory',line=TEAL,size=22)
-shape(s,7.15,4.88,5.05,.9,'Recompute rnew\n= b − A₀(x + δ)',line=TEAL,size=22)
+shape(s,7.15,4.88,5.05,.9,'Updated true residual\nrnew = b − A₀(x + δ)',line=TEAL,size=22)
 line(s,9.67,2.75,9.67,3.25,TEAL);line(s,9.67,4.35,9.67,4.88,TEAL)
 note(s,'The exact solution x* is only a reference for evaluation. The algorithm uses the computable residual.',size=19)
 
@@ -260,14 +271,14 @@ for l,(n,y) in enumerate([(64,1.85),(22,3.1),(8,4.35)]):
     shape(s,.65,y,3.85,.78,f'Level {l}: {n} values\n3 pre-sweeps',line=AMBER,size=21)
     shape(s,8.75,y,3.85,.78,f'Add P{sub}e{nxt}\n3 post-sweeps',line=AMBER,size=21)
     if l<2:
-        line(s,2.57,y+.78,2.57,y+1.25,TEAL);text(s,2.83,y+.78,3.6,.4,f'g{nxt} = R{sub}(g{sub} − A{sub}e{sub})',16,TEAL)
+        line(s,2.57,y+.78,2.57,y+1.25,TEAL);text(s,.9,y+.83,3.9,.32,f'g{nxt} = R{sub}(g{sub} − A{sub}e{sub})',16,TEAL)
         line(s,10.67,y+1.25,10.67,y+.78,TEAL)
     else:
         path(s,[(2.57,y+.78),(2.57,5.87),(5.0,5.87)],TEAL)
         text(s,.65,5.22,4.5,.35,'g₃ = R₂(g₂ − A₂e₂)',17,TEAL)
         path(s,[(8.3,5.87),(10.67,5.87),(10.67,y+.78)],TEAL)
 shape(s,5.0,5.47,3.3,.8,'CPU direct solve\nA₃e₃ = g₃  (3 × 3)',line=TEAL,fill='EAF5F4',size=20)
-text(s,4.75,2.2,3.75,2.2,'At every level:\nsave gℓ and eℓ\n\nOnly smoothing MVMs\nuse the optical route.',21,GRAY,align=PP_ALIGN.CENTER)
+text(s,4.95,2.25,3.35,2.0,'At every level:\nsave gℓ and eℓ\n\nOnly smoothing MVMs\nuse the optical route.',21,GRAY,align=PP_ALIGN.CENTER)
 note(s,'Return z = e₀ to PCG. The V-cycle supplies an approximate correction, not the final PDE solution.',size=19)
 
 # 10
@@ -275,7 +286,7 @@ s=new('Smoothing and coarse correction', WEB_SRC+'; derived.json controlled erro
       'This is a controlled numerical teaching experiment using the stored browser operators, not a physical measurement. Choose an initial error sin(πt)+0.35sin(32πt), solve homogeneous error equation with three Richardson sweeps, apply the recursive coarse correction, then three post-sweeps. Display error profiles against zero. Norms are independently computed. The amplification relation follows directly from the Richardson update.',stage=2)
 t=DER['t'];ep=DER['error_profiles'];norms=DER['error_norms']
 chart(s,[('initial error',t,ep['initial'],GRAY),('3 smoothing sweeps',t,ep['after_smooth'],AMBER),('after coarse correction',t,ep['after_coarse'],TEAL)],.55,1.75,8.2,4.5,'position t','error')
-text(s,9.0,2.0,3.65,1.4,'εnew = (I − ωA)ε\n\nMode j shrinks by\n1 − ωλⱼ',23,NAVY,font=MATH)
+text(s,9.0,2.0,3.65,1.4,'εnew = (I − ωA)ε\n\nMode j: 1 − ωλⱼ',22,NAVY,font=MATH)
 text(s,9.0,4.2,3.6,1.4,f'Error norm\n{norms["initial"]:.2f} → {norms["after_smooth"]:.2f} → {norms["after_coarse"]:.2f}',23,TEAL)
 note(s,'Three post-sweeps reduce the norm further to '+f'{norms["after_post"]:.3f}'+'. The initial error is prescribed for this test.',size=18)
 
@@ -285,8 +296,10 @@ s=new('PCG turns a V-cycle correction into a search step', WEB_SRC+'; PCG recurr
 steps=[('Initialize','δ = 0;  s = r − A₀δ'),('Precondition','z = Vcycle(s);  p = z;  ρ = sᵀz'),('CPU MVM','q = A₀p'),('Step length','α = ρ / (pᵀq)'),('Update','δ ← δ + αp;  s ← s − αq')]
 for i,(a,b) in enumerate(steps):
     yy=1.78+i*.86
-    shape(s,.7,yy,7.6,.67,a+'    '+b,line=TEAL,size=21)
-    if i<4:line(s,4.5,yy+.67,4.5,yy+.86,TEAL)
+    shape(s,.7,yy,7.6,.68,'',line=LIGHT)
+    text(s,.88,yy+.14,1.8,.4,a,16,GRAY,True)
+    equation(s,2.8,yy+.08,5.15,.52,b,23,TEAL)
+    if i<4:line(s,4.5,yy+.68,4.5,yy+.86,TEAL)
 text(s,8.9,2.15,3.6,1.5,'p: direction\nα: step length\nδ: correction so far',23,NAVY)
 text(s,8.9,4.1,3.6,1.5,'PCG arithmetic: CPU\nVcycle invokes\noptical products.',21,GRAY)
 note(s,'The original full estimate x stays fixed until this correction solve returns δ.',size=20)
@@ -331,7 +344,7 @@ table(s,['Level','Operator and nonzeros','Prolongation Pℓ','Restriction Rℓ',
  ['2','A₂: 8 × 8, 22','8 × 3','3 × 8','A: optics + CPU'],
  ['3','A₃: 3 × 3, 7','—','—','CPU direct solve'],
  ],h=3.7,widths=[.08,.28,.19,.19,.26],size=19)
-text(s,.7,5.95,12,.5,'Aℓ₊₁ = Rℓ Aℓ Pℓ        Rℓ = Pℓᵀ        ωℓ ≈ 1 / λmax(Aℓ)',24,TEAL,font=MATH)
+text(s,.7,5.8,12,.5,'Aℓ₊₁ = Rℓ Aℓ Pℓ        Rℓ = Pℓᵀ        ωℓ ≈ 1 / λmax(Aℓ)',24,TEAL,font=MATH)
 note(s,'The CPU retains separate local vectors at each level. Coarse vectors are coefficients in algebraic spaces.',size=18)
 
 # 15
@@ -388,21 +401,22 @@ note(s,'Next: calibrated noise + repeated trials + full cost accounting, with th
 
 # 20
 s=new('Complete recurrence and termination conditions', WEB_SRC, 'Exact algebraic recurrence of the browser core. Index k counts completed PCG iterations. rho_new overwrites rho after beta. At the capped final iteration, the source still computes its next V-cycle and direction before returning. Breakdown checks nonfinite alpha and positive pTq. Outer loop distinguishes convergence and limit.',subtitle='Technical appendix: browser configuration',appendix=True)
-table(s,['Routine','Ordered operations'],[
- ['Outer initialization','Choose x. Load Aℓ, Pℓ, Rℓ, ωℓ, b.'],
- ['Outer check','r = b − A₀x; test ||r|| / ||b|| < 10⁻¹².'],
- ['PCG initialization','δ = 0; s = r − A₀δ; z = V(s); p = z; ρ = sᵀz.'],
- ['PCG step','q = A₀p; α = ρ/(pᵀq); δ += αp; s −= αq.'],
- ['PCG check','Return δ if ||s|| / ||r|| < 10⁻².'],
- ['New direction','z = V(s); ρnew = sᵀz; β = ρnew/ρ; p = z + βp; ρ = ρnew.'],
- ['Caps / return','PCG: 20 steps. Outer: 10 corrections, then final true-residual check.'],
- ['Outer update','x += δ; return to fresh outer residual.'],
- ],h=4.65,widths=[.23,.77],size=17)
+text(s,.7,1.82,5.5,.4,'Outer correction',23,NAVY,True)
+text(s,6.75,1.82,5.5,.4,'PCG correction',23,NAVY,True)
+outer_rows=[('Measure the true residual','r = b − A₀x'),('Check convergence','η = ||r||₂ / ||b||₂'),('Approximately solve','A₀δ ≈ r'),('Update the full solution','x ← x + δ')]
+inner_rows=[('Initialize and precondition','δ = 0; s = r; z = Vcycle(s)'),('Choose direction and step','p = z; ρ = sᵀz; q = A₀p'),('Calculate step length','α = ρ / (pᵀq)'),('Update correction and residual','δ ← δ + αp; s ← s − αq')]
+for col,rows in enumerate([outer_rows,inner_rows]):
+    x=.7+col*6.05
+    for i,(label,expr) in enumerate(rows):
+        yy=2.5+i*.83
+        text(s,x,yy,5.5,.27,label,15,GRAY)
+        equation(s,x,yy+.28,5.4,.45,expr,24,TEAL)
+note(s,'Outer: 10⁻¹² target, 10 corrections. PCG: 10⁻² relative target, 20 steps; direction update on slide 12.',size=17)
 
 # 21
 s=new('Recursive V-cycle and smoothing pseudocode', WEB_SRC, 'V(l,g) returns a local correction. R_l=P_l transpose. The coarse solve uses elimination, not an explicit inverse. CPU computes d and all transfer products. e starts at zero only on V-cycle entry; post-smoothing starts from the corrected value. Main2D cycle differs and is shown later.',appendix=True,subtitle='Every operation belongs to a CPU or optical assignment')
-text(s,.65,1.85,7.5,4.8,'V(l, g):\n  if l = 3: return solve(A₃, g)\n  e = 0\n  repeat 3 times: e = Smooth(l, e, g)\n  d = g − Aℓe                 [CPU]\n  gc = Rℓd                    [CPU]\n  ec = V(l + 1, gc)\n  e = e + Pℓec                [CPU]\n  repeat 3 times: e = Smooth(l, e, g)\n  return e',21,NAVY,font='DejaVu Sans Mono')
-text(s,8.3,1.85,4.25,3.2,'Smooth(l, e, g):\n\nencode e\ny = Aℓe      [optical]\ndetect y\ne = e + ωℓ(g − y)\n                 [CPU]\nreturn e',22,TEAL)
+text(s,.65,1.85,7.35,4.45,'V(l, g):\n  if l = 3: return solve(A₃, g)\n  e = 0\n  repeat 3 times: e = Smooth(l, e, g)\n  d = g − Aℓe                 [CPU]\n  gc = Rℓd                    [CPU]\n  ec = V(l + 1, gc)\n  e = e + Pℓec                [CPU]\n  repeat 3 times: e = Smooth(l, e, g)\n  return e',17,NAVY,font='DejaVu Sans Mono')
+text(s,8.55,1.85,4.05,3.9,'Smooth(l, e, g):\n\nencode e\ny = Aℓe      [optical]\ndetect y\ne = e + ωℓ(g − y)\n                 [CPU]\nreturn e',22,TEAL)
 note(s,'At level 0, g₀ = s and V(0, s) returns z. The outer solution x is separate.',size=19)
 
 # 22
