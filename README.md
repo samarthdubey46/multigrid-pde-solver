@@ -13,7 +13,7 @@ Open either HTML file locally. Both are self-contained and work offline, with re
 
 ## Presentation
 
-[Download editable PowerPoint](presentation/output/photonic-pde-architecture.pptx): 19 main slides plus 16 technical appendix slides, with speaker notes, equations, matrices, measured graphs and sources. [PDF version](presentation/output/photonic-pde-architecture.pdf) also available. Equations use consistent mathematical typesetting; flowcharts, tables, body text and charts remain editable. Research and generation files are in `presentation/`.
+[Download editable PowerPoint](presentation/output/photonic-pde-architecture.pptx): 19 main slides plus 14 technical appendix slides, with speaker notes, equations, matrices, measured graphs and sources. [PDF version](presentation/output/photonic-pde-architecture.pdf) also available. Equations use consistent mathematical typesetting; flowcharts, tables, body text and charts remain editable. Research and generation files are in `presentation/`.
 
 ## Python experiments
 

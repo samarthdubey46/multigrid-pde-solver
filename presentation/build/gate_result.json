@@ -72,7 +72,7 @@
       "message": "Text likely overflows box by ~24%"
     },
     {
-      "slide": 30,
+      "slide": 29,
       "category": "text_overflow",
       "message": "Text likely overflows box by ~17%"
     }

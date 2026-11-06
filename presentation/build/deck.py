@@ -22,7 +22,7 @@ LEE='https://arxiv.org/pdf/2511.01005'
 ZHU='https://doi.org/10.1021/acsphotonics.3c01694'
 WEB_SRC='web/index.html: PhotonicSolver numerical core and embedded sparse matrix data'
 MAIN_SRC='main.py: original solver, observed by presentation/build/collect_python.py'
-ENG=MckEngine(total_slides=35); PRS=ENG.prs
+ENG=MckEngine(total_slides=33); PRS=ENG.prs
 META=[]
 
 def rgb(c):return RGBColor.from_string(c)
@@ -90,8 +90,6 @@ def new(title,source,notes='',stage=None,subtitle=None,layout='side_by_side',app
     line(sl,.6,1.08,12.7,1.08,LIGHT,1,False)
     if stage is not None:mini(sl,stage)
     elif subtitle:tag(sl,subtitle)
-    footer=source.replace(WEB_SRC,'Browser solver').replace(MAIN_SRC,'main.py · recorded numerical run')
-    text(sl,.65,7.22,11.0,.22,('Technical appendix  /  ' if appendix else '')+footer,9,GRAY)
     text(sl,12.1,7.22,.6,.26,str(n),12,GRAY,align=PP_ALIGN.RIGHT)
     sl.notes_slide.notes_text_frame.text=notes+'\n\nSources: '+source
     META.append(dict(idx=n,title=title,layout=layout,source=source,notes=notes,appendix=appendix))
@@ -462,12 +460,6 @@ for i,(lab,key,n,m) in enumerate(items):
 text(s,.7,5.93,12,.5,'A = I₆₄ ⊗ T₆₄ + T₆₄ ⊗ I₆₄      Ac = RAP      R = Pᵀ',24,NAVY,font=MATH)
 note(s,'T₆₄ = tridiag(−1, 2, −1). Patterns use 64 × 64 occupancy bins. Coarse solve: CPU.',size=18)
 
-# 28
-s=new('The noisy smoother has a specific software model', MAIN_SRC, 'Exact noisy_mvm implementation: scale ismaxabs(v), zero input returnszeros; q=round(127v/scale)/127; y=4scale[(Aq)/4+Gaussian(0,.045²)]. No separate matrix quantization or256-repeat averaging. Main smooth initializes e=omega*rhs, algebraically skippingA@0, so4pre sweeps callanalogMVM3times. Each hybrid V-cycle computes residualdigitally, restricts, does spsolve, prolongs, and returns withoutpostsmoothing.',appendix=True,subtitle='main.py: input quantization + independent Gaussian output noise')
-text(s,.75,1.85,11.7,2.4,'a = ||v||∞\nq = round(127 v / a) / 127\nỹ = 4a [ (Aq)/4 + ξ ],     ξᵢ ∼ N(0, 0.045²)',28,NAVY,font=MATH)
-text(s,.75,4.35,11.8,1.5,'If a = 0, return zero.\nFour pre-sweeps begin with e = ωg, then use three analog MVMs.\nNo post-smoothing in the hybrid configuration.',23,TEAL)
-note(s,'Not modeled: matrix quantization, optical averaging, device drift, saturation, conversion timing, or energy.',size=18)
-
 # 29
 s=new('Settings and counter definitions', 'main.py; web/index.html; source-level review', 'main.py uses SciPy CG with inner rtol1e-12 and maximum5steps in each outer restart, tolerance1e-10 maximum100restarts. Browser inner rtol1e-2maximum20,outer1e-12maximum10. main counter includes fineA exact/noisy wrappers only; excludes setup/diagnostics/transfers/coarsesolve. Browser countsdigital A,R,P, plus opticalA and convertercalls. Neither is a complete hardware cost model. main.py ignores info codes; reported convergence independently checked.',appendix=True)
 table(s,['Setting','main.py hybrid','Browser'],[
@@ -530,14 +522,6 @@ hs=MAIN['true_history'];ix=list(range(len(hs)))
 chart(s,[('true residual',ix,hs,TEAL),('target 10⁻¹⁰',ix,[1e-10]*len(ix),GRAY)],.6,1.8,8.5,4.55,'completed outer corrections','relative residual',True)
 text(s,9.3,2.2,3.1,2.1,'Four corrections\n\n20 V-cycles\n\n60 analog calls',24,NAVY)
 note(s,'Observed convergence for this seeded run; robustness across noise realizations remains to be measured.',size=18)
-
-# Sources
-s=new('Sources and reproducibility', 'Primary papers, current source code, and recorded numerical runs',
-      'Primarymethodsource Leehttps://arxiv.org/pdf/2511.01005. Zhuhttps://doi.org/10.1021/acsphotonics.3c01694. BackgroundShewchukhttps://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf. Presentationdesignreferenceshttps://writing.engr.psu.edu/AE_Student_Classroom_Notes.pdf andhttps://catalyst.harvard.edu/writing-communication-center/visualize-science/slides/. Compared publicmultigridtutorialhttps://sites.cs.ucsb.edu/~gilbert/cs219/cs219Spr2018/Slides/cs219-12-mgtut_part2.pdf. No publishedslideartworkcopied. All numericalcharts use recordedsourcevalues.',appendix=True)
-text(s,.7,1.75,12,2.2,'Lee et al. (2025), Integrated photonic multigrid solver for partial differential equations\narXiv:2511.01005\n\nZhu et al. (2024), Coherent General-Purpose Photonic Matrix Processor\nACS Photonics 11, 1189–1196. DOI: 10.1021/acsphotonics.3c01694',21,NAVY)
-text(s,.7,4.1,12,1.3,'Repository evidence: main.py and web/index.html\nBrowser: all three initial guesses reproduced.\n2D: original noise generator seed 0; PyAMG setup fixed with NumPy seed 0.',20,TEAL)
-v=MAIN['versions']
-text(s,.7,5.6,12,.8,'Run environment: '+', '.join(k+' '+v for k,v in v.items())+'\nSource SHA-256: '+MAIN['sha256'][:24]+'…',17,GRAY)
 
 # Persist machine-readable content and speaker notes before rendering.
 for i,m in enumerate(META):

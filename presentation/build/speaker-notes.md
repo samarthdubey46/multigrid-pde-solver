@@ -160,50 +160,38 @@ All four stored matrices of main.py: A,P,R,Ac. Matrix A has4096rows,20224nnz. P4
 
 Sources: main.py: original solver, observed by presentation/build/collect_python.py
 
-## 28. The noisy smoother has a specific software model
-
-Exact noisy_mvm implementation: scale ismaxabs(v), zero input returnszeros; q=round(127v/scale)/127; y=4scale[(Aq)/4+Gaussian(0,.045²)]. No separate matrix quantization or256-repeat averaging. Main smooth initializes e=omega*rhs, algebraically skippingA@0, so4pre sweeps callanalogMVM3times. Each hybrid V-cycle computes residualdigitally, restricts, does spsolve, prolongs, and returns withoutpostsmoothing.
-
-Sources: main.py: original solver, observed by presentation/build/collect_python.py
-
-## 29. Settings and counter definitions
+## 28. Settings and counter definitions
 
 main.py uses SciPy CG with inner rtol1e-12 and maximum5steps in each outer restart, tolerance1e-10 maximum100restarts. Browser inner rtol1e-2maximum20,outer1e-12maximum10. main counter includes fineA exact/noisy wrappers only; excludes setup/diagnostics/transfers/coarsesolve. Browser countsdigital A,R,P, plus opticalA and convertercalls. Neither is a complete hardware cost model. main.py ignores info codes; reported convergence independently checked.
 
 Sources: main.py; web/index.html; source-level review
 
-## 30. Convergence theory and observed results
+## 29. Convergence theory and observed results
 
 SciPy CG requires Hermitian positive definiteA and a Hermitian positive definite preconditioner. The standard fixed linear SPD-preconditioner argument doesnot transfer automatically to this noisy, quantized, asymmetric action. This run converges empirically. A nextcomparison should include flexibleKrylov formulations and multiple noise realizations. https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.cg.html . Residual-error relation is exact for invertibleA; conditioning and discretization remain distinct.
 
 Sources: SciPy CG documentation; main.py; web/index.html
 
-## 31. Related work: Zhu’s coherent processor
+## 30. Related work: Zhu’s coherent processor
 
 Relatedwork only. Verified publisherabstract describes coherent analogue cores that perform signed multiplication, digital electronics for memory/reconfigurability, and error management for finite-difference PDEs. The supplementary-information listing explicitly covers fixed-point Richardson and Jacobi with residuecorrection. We do not claim a reproduction of that hardware, exact PDE geometry, bitdepth, or iteration schedule. Source:https://doi.org/10.1021/acsphotonics.3c01694. Fullpaywalledarticle wasnotused for detailednumericalclaims.
 
 Sources: Zhu et al., ACS Photonics 11, 1189–1196 (2024)
 
-## 32. The actual two-level cycle in main.py
+## 31. The actual two-level cycle in main.py
 
 Exact main.py V-cycle. smooth(g,mvm,pre) starts e=omega*g, then applies pre-1 updates. The residual d=g−A e is digital. RestrictionR, coarse spsolveAc, and prolongationP are digital. For digital2/2, post smoothing is applied as a correction to the existing e: e+=smooth(g−A e,exact_mvm,2). This equals two Richardson post-updates in exact arithmetic. Hybrid4/0returnswithoutpost. PlainCG anddigitalMGCGsolveAx=bdirectly; onlyhybridusesouterrestartscorrectionloop.
 
 Sources: main.py: original solver, observed by presentation/build/collect_python.py
 
-## 33. Setup constructs operators before iteration starts
+## 32. Setup constructs operators before iteration starts
 
 Hierarchy is constructed before reported solver counters. PyAMG smoothed aggregation formsP,R and Galerkincoarseoperators. Browser ships these matrices asCSRarrays; allsetupiscompletebeforevisualized solve. Source smoother.py computesweightsbyeigsh. main.py estimatesfineoperator spectralradiusby30poweriterationsusing itsseededgenerator. Stored browsercoarsestomega isunusedbecauselevel3directsolve. Setup isnot countedinthe reportedMVMs.
 
 Sources: web/index.html: PhotonicSolver numerical core and embedded sparse matrix data; main.py PyAMG setup
 
-## 34. True residuals contract across noisy restarts
+## 33. True residuals contract across noisy restarts
 
 The histogram is not reconstructed from CG recursive residuals. At each accumulatedoutercorrection,weindependentlycompute||b−Ax||/||b||withthesparseA. FourcorrectioncallswithfiveCGstepseachproduce20Vcycles and60analogcalls. Theouterloopthenchecksconvergence. Monitoring MVMs areanalysisdiagnostics andnotinsertedintotheoriginalcounter. Plot usesa truelogarithmicverticalaxis.
 
 Sources: main.py: original solver, observed by presentation/build/collect_python.py; independently recomputed residual history
-
-## 35. Sources and reproducibility
-
-Primarymethodsource Leehttps://arxiv.org/pdf/2511.01005. Zhuhttps://doi.org/10.1021/acsphotonics.3c01694. BackgroundShewchukhttps://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf. Presentationdesignreferenceshttps://writing.engr.psu.edu/AE_Student_Classroom_Notes.pdf andhttps://catalyst.harvard.edu/writing-communication-center/visualize-science/slides/. Compared publicmultigridtutorialhttps://sites.cs.ucsb.edu/~gilbert/cs219/cs219Spr2018/Slides/cs219-12-mgtut_part2.pdf. No publishedslideartworkcopied. All numericalcharts use recordedsourcevalues.
-
-Sources: Primary papers, current source code, and recorded numerical runs

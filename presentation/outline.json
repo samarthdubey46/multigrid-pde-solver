@@ -164,49 +164,37 @@
     },
     {
       "idx": 28,
-      "title": "The noisy smoother has a specific software model",
-      "layout": "side_by_side",
-      "appendix": true
-    },
-    {
-      "idx": 29,
       "title": "Settings and counter definitions",
       "layout": "side_by_side",
       "appendix": true
     },
     {
-      "idx": 30,
+      "idx": 29,
       "title": "Convergence theory and observed results",
       "layout": "side_by_side",
       "appendix": true
     },
     {
-      "idx": 31,
+      "idx": 30,
       "title": "Related work: Zhu\u2019s coherent processor",
       "layout": "side_by_side",
       "appendix": true
     },
     {
-      "idx": 32,
+      "idx": 31,
       "title": "The actual two-level cycle in main.py",
       "layout": "side_by_side",
       "appendix": true
     },
     {
-      "idx": 33,
+      "idx": 32,
       "title": "Setup constructs operators before iteration starts",
       "layout": "side_by_side",
       "appendix": true
     },
     {
-      "idx": 34,
+      "idx": 33,
       "title": "True residuals contract across noisy restarts",
-      "layout": "side_by_side",
-      "appendix": true
-    },
-    {
-      "idx": 35,
-      "title": "Sources and reproducibility",
       "layout": "side_by_side",
       "appendix": true
     }

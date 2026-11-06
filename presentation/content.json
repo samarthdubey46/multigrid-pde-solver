@@ -15,7 +15,6 @@
       "text": [
         "Photonic multigrid for Poisson problems",
         "",
-        "Project implementation inspired by Lee et al. (2025)",
         "1",
         "A digital iterative solver with\nphotonic matrix\u2013vector products",
         "Fixed matrices and changing correction vectors solve Ax = b",
@@ -39,7 +38,6 @@
       "text": [
         "The paper assigns smoothing products to optics",
         "",
-        "Lee et al., arXiv:2511.01005, pp. 3\u20136, 15\u201316",
         "2",
         "Numerical structure adopted here",
         "Digital residual correction",
@@ -66,7 +64,6 @@
       "text": [
         "Three implementations, different settings",
         "",
-        "Lee et al.; main.py; web/index.html; smoother.py",
         "3",
         "Main explanation: browser\u2019s 1D model. Research evidence: main.py\u2019s separate 2D run."
       ],
@@ -122,7 +119,6 @@
         "The unknown vector stores sampled solution values",
         "",
         "Ideal 1D teaching model",
-        "Browser solver",
         "4",
         "",
         "",
@@ -143,7 +139,6 @@
         "The residual becomes the next correction problem",
         "",
         "True residual check",
-        "Browser solver; Lee Methods p. 16",
         "5",
         "",
         "",
@@ -171,7 +166,6 @@
         "One solver map connects all four routines",
         "",
         "Read downward for calls; read upward for returned values",
-        "Browser solver",
         "6",
         "1  Outer correction\nfull solution x",
         "2  PCG correction\naccumulated correction \u03b4",
@@ -202,7 +196,6 @@
         "The CPU closes every optical smoothing loop",
         "",
         "Optical smoothing",
-        "Browser solver; web/README.md hardware mapping",
         "7",
         "CPU\nstate +\nupdates",
         "DAC +\nencoder",
@@ -248,7 +241,6 @@
         "A real smoothing request changes the local vector",
         "",
         "Optical smoothing",
-        "Browser solver; zero-start event trace",
         "8",
         "\u03c9\u2080 = 5.9206167e-05    \u00b7    64 entries    \u00b7    full x unchanged",
         "Next sweep encodes the updated e\u2080 through the same fixed matrix A\u2080."
@@ -289,7 +281,6 @@
         "The multigrid V-cycle",
         "",
         "Multigrid V-cycle",
-        "Browser solver",
         "9",
         "Level 0: 64 values\n3 pre-sweeps",
         "Add P\u2080e\u2081\n3 post-sweeps",
@@ -331,7 +322,6 @@
         "Smoothing and coarse correction",
         "",
         "Multigrid V-cycle",
-        "Browser solver; derived.json controlled error experiment",
         "10",
         "",
         "",
@@ -352,7 +342,6 @@
         "PCG turns a V-cycle correction into a search step",
         "",
         "PCG correction",
-        "Browser solver; PCG recurrence",
         "11",
         "",
         "Initialize",
@@ -389,7 +378,6 @@
         "PCG stopping and direction updates",
         "",
         "PCG correction",
-        "Browser solver; browser inner limit: 20 iterations",
         "12",
         "",
         "Return \u03b4 to outer loop",
@@ -422,7 +410,6 @@
         "Outer correction and true-residual checks",
         "",
         "True residual check",
-        "Browser solver; main.py solve_with_restarts",
         "13",
         "Start with current x",
         "\n",
@@ -464,7 +451,6 @@
         "The hierarchy is fixed while its vectors change",
         "",
         "Browser operator inventory: 4 A matrices + 3 P matrices + 3 R matrices",
-        "Browser solver; Galerkin and transpose identities verified",
         "14",
         "",
         "The CPU retains separate local vectors at each level. Coarse vectors are coefficients in algebraic spaces."
@@ -520,7 +506,6 @@
         "Convergence of the ideal browser model",
         "",
         "Ideal 1D model. Zero starting guess. Target 10\u207b\u00b9\u00b2.",
-        "Browser solver; fresh zero-start execution",
         "15",
         "Final \u03b7 = 3.17 \u00d7 10\u207b\u00b9\u00b3      180 optical calls      111 digital calls      10 V-cycles"
       ],
@@ -537,7 +522,6 @@
         "The separate 2D noisy experiment",
         "",
         "main.py: 4096 unknowns, two AMG levels, input quantization and output noise",
-        "main.py \u00b7 recorded numerical run",
         "16",
         "4x\u1d62\u2c7c \u2212 x\u1d62\u208b\u2081,\u2c7c \u2212 x\u1d62\u208a\u2081,\u2c7c",
         "",
@@ -562,7 +546,6 @@
         "Counted digital products in the 2D run",
         "",
         "Same 2D problem and final relative-residual target 10\u207b\u00b9\u2070. Counter scope matters.",
-        "main.py \u00b7 recorded numerical run; one controlled run, setup seed 0",
         "17",
         "",
         "Ratio of counted digital products\nNo measured hardware speedup",
@@ -607,7 +590,6 @@
       "text": [
         "Implemented behavior and open questions",
         "",
-        "main.py \u00b7 recorded numerical run; web/README.md; Lee Methods",
         "18",
         "Related work: Zhu et al. (2024) provides a coherent signed-MVM architecture with digital memory and control."
       ],
@@ -646,7 +628,6 @@
       "text": [
         "Next validation: full computational cost",
         "",
-        "main.py \u00b7 recorded numerical run; web/README.md",
         "19",
         "Optics computes matrix\u2013vector products.\nThe CPU builds and verifies the solution.",
         "Residual check\nWhat remains unsatisfied?",
@@ -671,7 +652,6 @@
         "Complete recurrence and termination conditions",
         "",
         "Technical appendix: browser configuration",
-        "Technical appendix  /  Browser solver",
         "20",
         "Outer correction",
         "PCG correction",
@@ -698,7 +678,6 @@
         "Recursive V-cycle and smoothing pseudocode",
         "",
         "Every operation belongs to a CPU or optical assignment",
-        "Technical appendix  /  Browser solver",
         "21",
         "V(l, g):\n  if l = 3: return solve(A\u2083, g)\n  e = 0\n  repeat 3 times: e = Smooth(l, e, g)\n  d = g \u2212 A\u2113e                 [CPU]\n  gc = R\u2113d                    [CPU]\n  ec = V(l + 1, gc)\n  e = e + P\u2113ec                [CPU]\n  repeat 3 times: e = Smooth(l, e, g)\n  return e",
         "Smooth(l, e, g):",
@@ -724,7 +703,6 @@
         "Fine operators A\u2080 and A\u2081",
         "",
         "A\u2080: 64 \u00d7 64, 190 nonzeros. A\u2081: 22 \u00d7 22, 64 nonzeros.",
-        "Technical appendix  /  Browser solver",
         "22",
         "",
         "",
@@ -1075,7 +1053,6 @@
         "Coarse operators A\u2082 and A\u2083",
         "",
         "Full matrices shown. Entries rounded to 3 decimals.",
-        "Technical appendix  /  Browser solver",
         "23",
         "A\u2082  (8 \u00d7 8): optical smoothing + digital residuals",
         "A\u2083  (3 \u00d7 3)\nCPU direct solve"
@@ -1221,7 +1198,6 @@
         "Transfer operators P\u2080 and R\u2080",
         "",
         "P\u2080: 64 \u00d7 22. R\u2080: 22 \u00d7 64. Fixed algebraic transfer operators.",
-        "Technical appendix  /  Browser solver",
         "24",
         "",
         "",
@@ -1541,7 +1517,6 @@
         "Transfer operators P\u2081 and R\u2081",
         "",
         "P\u2081: 22 \u00d7 8. R\u2081: 8 \u00d7 22. Fixed algebraic transfer operators.",
-        "Technical appendix  /  Browser solver",
         "25",
         "",
         "",
@@ -1721,7 +1696,6 @@
         "Transfer operators P\u2082 and R\u2082",
         "",
         "Full final transfer pair. R\u2082 = P\u2082\u1d40. Both operations run on the CPU.",
-        "Technical appendix  /  Browser solver",
         "26",
         "P\u2082e\u2083 has 8 entries.\nR\u2082d\u2082 has 3 entries."
       ],
@@ -1841,7 +1815,6 @@
         "The 2D experiment uses four fixed sparse matrices",
         "",
         "main.py hierarchy from the measured run; distinct from the browser matrices",
-        "Technical appendix  /  main.py \u00b7 recorded numerical run",
         "27",
         "A: 4096 \u00d7 4096\n20,224 nonzeros",
         "",
@@ -3166,27 +3139,6 @@
     },
     {
       "idx": 28,
-      "title": "The noisy smoother has a specific software model",
-      "layout": "side_by_side",
-      "source": "main.py: original solver, observed by presentation/build/collect_python.py",
-      "notes": "Exact noisy_mvm implementation: scale ismaxabs(v), zero input returnszeros; q=round(127v/scale)/127; y=4scale[(Aq)/4+Gaussian(0,.045\u00b2)]. No separate matrix quantization or256-repeat averaging. Main smooth initializes e=omega*rhs, algebraically skippingA@0, so4pre sweeps callanalogMVM3times. Each hybrid V-cycle computes residualdigitally, restricts, does spsolve, prolongs, and returns withoutpostsmoothing.",
-      "appendix": true,
-      "text": [
-        "The noisy smoother has a specific software model",
-        "",
-        "main.py: input quantization + independent Gaussian output noise",
-        "Technical appendix  /  main.py \u00b7 recorded numerical run",
-        "28",
-        "",
-        "",
-        "",
-        "If a = 0, return zero.\nFour pre-sweeps begin with e = \u03c9g, then use three analog MVMs.\nNo post-smoothing in the hybrid configuration.",
-        "Not modeled: matrix quantization, optical averaging, device drift, saturation, conversion timing, or energy."
-      ],
-      "tables": []
-    },
-    {
-      "idx": 29,
       "title": "Settings and counter definitions",
       "layout": "side_by_side",
       "source": "main.py; web/index.html; source-level review",
@@ -3195,8 +3147,7 @@
       "text": [
         "Settings and counter definitions",
         "",
-        "Technical appendix  /  main.py; web/index.html; source-level review",
-        "29"
+        "28"
       ],
       "tables": [
         [
@@ -3244,7 +3195,7 @@
       ]
     },
     {
-      "idx": 30,
+      "idx": 29,
       "title": "Convergence theory and observed results",
       "layout": "side_by_side",
       "source": "SciPy CG documentation; main.py; web/index.html",
@@ -3253,8 +3204,7 @@
       "text": [
         "Convergence theory and observed results",
         "",
-        "Technical appendix  /  SciPy CG documentation; main.py; web/index.html",
-        "30",
+        "29",
         "Classical PCG assumes a fixed, linear, SPD preconditioner.\nNoise and quantization make this V-cycle variable.",
         "",
         "",
@@ -3263,7 +3213,7 @@
       "tables": []
     },
     {
-      "idx": 31,
+      "idx": 30,
       "title": "Related work: Zhu\u2019s coherent processor",
       "layout": "side_by_side",
       "source": "Zhu et al., ACS Photonics 11, 1189\u20131196 (2024)",
@@ -3272,8 +3222,7 @@
       "text": [
         "Related work: Zhu\u2019s coherent processor",
         "",
-        "Technical appendix  /  Zhu et al., ACS Photonics 11, 1189\u20131196 (2024)",
-        "31",
+        "30",
         "Common principle: approximate optical linear operations cooperate with digital state and correction."
       ],
       "tables": [
@@ -3307,7 +3256,7 @@
       ]
     },
     {
-      "idx": 32,
+      "idx": 31,
       "title": "The actual two-level cycle in main.py",
       "layout": "side_by_side",
       "source": "main.py: original solver, observed by presentation/build/collect_python.py",
@@ -3317,8 +3266,7 @@
         "The actual two-level cycle in main.py",
         "",
         "4096 \u2192 704. Hybrid: four pre-sweeps, no post-smoothing.",
-        "Technical appendix  /  main.py \u00b7 recorded numerical run",
-        "32",
+        "31",
         "e = Smooth(g, 4 sweeps)     [3 analog calls]",
         "",
         "",
@@ -3338,7 +3286,7 @@
       "tables": []
     },
     {
-      "idx": 33,
+      "idx": 32,
       "title": "Setup constructs operators before iteration starts",
       "layout": "side_by_side",
       "source": "web/index.html: PhotonicSolver numerical core and embedded sparse matrix data; main.py PyAMG setup",
@@ -3347,8 +3295,7 @@
       "text": [
         "Setup constructs operators before iteration starts",
         "",
-        "Technical appendix  /  Browser solver; main.py PyAMG setup",
-        "33",
+        "32",
         "Discretize: A, b",
         "",
         "",
@@ -3393,7 +3340,7 @@
       ]
     },
     {
-      "idx": 34,
+      "idx": 33,
       "title": "True residuals contract across noisy restarts",
       "layout": "side_by_side",
       "source": "main.py: original solver, observed by presentation/build/collect_python.py; independently recomputed residual history",
@@ -3403,28 +3350,9 @@
         "True residuals contract across noisy restarts",
         "",
         "main.py noisy hybrid. Each correction solve has at most five CG steps.",
-        "Technical appendix  /  main.py \u00b7 recorded numerical run; independently recomputed residual history",
-        "34",
+        "33",
         "Four corrections\n\n20 V-cycles\n\n60 analog calls",
         "Observed convergence for this seeded run; robustness across noise realizations remains to be measured."
-      ],
-      "tables": []
-    },
-    {
-      "idx": 35,
-      "title": "Sources and reproducibility",
-      "layout": "side_by_side",
-      "source": "Primary papers, current source code, and recorded numerical runs",
-      "notes": "Primarymethodsource Leehttps://arxiv.org/pdf/2511.01005. Zhuhttps://doi.org/10.1021/acsphotonics.3c01694. BackgroundShewchukhttps://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf. Presentationdesignreferenceshttps://writing.engr.psu.edu/AE_Student_Classroom_Notes.pdf andhttps://catalyst.harvard.edu/writing-communication-center/visualize-science/slides/. Compared publicmultigridtutorialhttps://sites.cs.ucsb.edu/~gilbert/cs219/cs219Spr2018/Slides/cs219-12-mgtut_part2.pdf. No publishedslideartworkcopied. All numericalcharts use recordedsourcevalues.",
-      "appendix": true,
-      "text": [
-        "Sources and reproducibility",
-        "",
-        "Technical appendix  /  Primary papers, current source code, and recorded numerical runs",
-        "35",
-        "Lee et al. (2025), Integrated photonic multigrid solver for partial differential equations\narXiv:2511.01005\n\nZhu et al. (2024), Coherent General-Purpose Photonic Matrix Processor\nACS Photonics 11, 1189\u20131196. DOI: 10.1021/acsphotonics.3c01694",
-        "Repository evidence: main.py and web/index.html\nBrowser: all three initial guesses reproduced.\n2D: original noise generator seed 0; PyAMG setup fixed with NumPy seed 0.",
-        "Run environment: numpy 2.5.2, scipy 1.18.1, pyamg 5.3.0\nSource SHA-256: 1dd6d0bcfa05058dbdf3730a\u2026"
       ],
       "tables": []
     }
