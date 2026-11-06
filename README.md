@@ -2,6 +2,8 @@
 
 Interactive hardware mapping and numerical experiments for multigrid-preconditioned iterative Poisson solvers, inspired by Lee et al., *Integrated photonic multigrid solver for partial differential equations*.
 
+Live website: [Detailed lab](https://samarthdubey46.github.io/multigrid-pde-solver/web/index.html) · [Continuous flowchart](https://samarthdubey46.github.io/multigrid-pde-solver/web/loop.html)
+
 ## Interactive pages
 
 - [Detailed laboratory](web/index.html): guided hardware architecture, solver operations, vectors, matrices and diagnostics.
