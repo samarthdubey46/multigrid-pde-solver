@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photonic PDE — continuous solver loop</title>
+<style>
+:root{--ink:#e1ebf5;--muted:#a8bacb;--cpu:#7ddbd2;--light:#ffc067;--transfer:#c5acf0;--line:#476075;--paper:#0b1420}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif}button,select,input{font:inherit}button,select{border:1px solid #375369;border-radius:5px;background:#121f2e;color:var(--ink);padding:9px 13px;cursor:pointer}button:hover{background:#203849}button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #a75f00;outline-offset:3px}button.primary{background:#17666b;color:#f4fbff;border-color:var(--cpu)}header{padding:22px 32px 12px;max-width:1520px;margin:auto}h1{font-size:26px;font-weight:600;letter-spacing:-.6px;margin:0 0 7px}.intro{font-size:14px;color:var(--muted);margin:0;line-height:1.5}.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px}.controls label{font-size:13px;display:flex;align-items:center;gap:7px}.controls a{margin-left:auto;color:var(--cpu);font-size:13px}.vectors{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:18px;padding-bottom:8px;border-bottom:1px solid #30475c}.vector{min-width:0;display:grid;grid-template-columns:1fr 145px;gap:8px;align-items:center}.vector strong{font-size:14px}.samples{font-size:12px;color:var(--muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin-top:5px;font-variant-numeric:tabular-nums}.spark{width:145px;height:50px}.metrics{display:flex;gap:22px;flex-wrap:wrap;font-size:13px;padding-top:12px}.metrics b{font-variant-numeric:tabular-nums}.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:6px}main{max-width:1520px;margin:auto;padding:0 15px 140px}.map{display:block;width:100%;height:auto}.node{cursor:pointer;outline:none}.node .box{fill:#121f2e;stroke:#375369;stroke-width:1.3;rx:8}.node .owner{font-size:12px;fill:var(--cpu)}.node .name{font-size:19px;font-weight:600;fill:var(--ink)}.node .equation{font-size:16px;fill:#bed1e0}.node .hint{font-size:13px;fill:#a8bacb}.node.optical .owner{fill:var(--light)}.node.optical .box{stroke:#8b683d;fill:#261f18}.node.active .box{stroke:var(--cpu);stroke-width:3;fill:#173b42}.node.optical.active .box{stroke:var(--light);fill:#3a2c17}.node:focus-visible .box{stroke:#a75f00;stroke-width:4}.node.inspected .box{stroke-dasharray:5 4}.edge{fill:none;stroke:var(--line);stroke-width:1.5;stroke-linejoin:round}.edge.optical{stroke:#88663b}.edge.active{stroke:var(--cpu);stroke-width:3}.edge.optical.active{stroke:var(--light)}.edge-label{font-size:12px;fill:#a8bacb;paint-order:stroke;stroke:var(--paper);stroke-width:5px;stroke-linejoin:round}.edge-label.secondary{opacity:0}.edge-label.secondary.active{opacity:1}.edge-label.active{fill:var(--cpu);font-weight:600}.lane-label{font-size:14px;fill:var(--muted)}.layer{transition:opacity .4s}.layer.inactive{opacity:.65}.layer.active{opacity:1}.layer .box{transition:transform .4s;transform-box:fill-box;transform-origin:center}.layer.inactive .box{transform:scale(.94)}.layer.active .box{transform:scale(1.02)}.packet{fill:var(--cpu);stroke:white;stroke-width:2}.packet.light{fill:#d18a0a}.caption{position:fixed;bottom:0;left:0;right:0;padding:14px 30px;background:#121f2e;box-shadow:0 -1px 0 #375369;z-index:5;display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,36%);gap:22px}.caption h2{font-size:16px;margin:0 0 5px}.caption p{font-size:13px;line-height:1.45;margin:0;color:var(--muted)}.caption code{font:13px Arial,sans-serif;color:var(--cpu);overflow-wrap:anywhere}.caption small{display:block;font-size:12px;color:var(--muted);margin-top:6px}.caption button{float:right;padding:3px 8px;font-size:12px}dialog{width:min(780px,92vw);border:1px solid #375369;border-radius:8px;padding:25px;color:var(--ink)}dialog::backdrop{background:#18374770}dialog h2{margin-top:0}dialog p{line-height:1.5;font-size:14px}dialog pre{overflow:auto;font-size:12px;line-height:1.8;background:var(--paper);padding:14px}dialog select{max-width:100%}.close{float:right}body:fullscreen{overflow:auto;background:var(--paper)}@media(max-width:700px){header{padding:17px 16px 10px}h1{font-size:22px}.vectors{gap:12px}.vector{display:block}.spark{width:100%;height:40px}.samples{font-size:11px}.controls{gap:6px}.controls button,.controls select{padding:8px;font-size:13px}.controls a{margin-left:0}.metrics{gap:10px;font-size:12px}.legend{gap:10px;font-size:11px}main{padding:0 3px 210px}.caption{padding:12px 15px;display:block}.caption h2{font-size:14px}.caption p{font-size:12px}.caption .value{margin-top:6px}.caption small{font-size:11px}.node .name{font-size:21px}.node .owner{font-size:14px}.node .equation{font-size:17px}.node .hint{font-size:14px}.edge-label{font-size:14px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.controls{position:sticky;top:0;z-index:6;background:#0b1420f5;max-width:1520px;margin:0 auto;padding:10px 32px;border-bottom:1px solid #30475c}@media(max-width:700px){.controls{padding:8px 12px;gap:5px}.controls label{font-size:12px}}
+:root{color-scheme:dark}.controls a{padding:6px;border-radius:4px}.controls a[aria-current]{background:#203849;color:#b4f4e9}
+</style></head><body>
+<header><h1>Photonic PDE solver · one continuous loop</h1><p class="intro">−u″(t) = 1, u(0) = 100, u(1) = 0 · 64 interior unknowns · ideal simulation; animation slowed for learning.</p>
+<div class="controls"><button id="play" class="primary">Play</button><button id="next">Next operation</button><button id="restart">Restart</button><label>Initial x <select id="guess"><option value="zero">Zero</option><option value="linear">Linear</option><option value="random">Random</option></select></label><label>Speed <select id="speed"><option value="1">1×</option><option value="3">3×</option><option value="10">10×</option></select></label><button id="finish">Finish solve</button><button id="matrices">Matrices</button><button id="fullscreen">Full screen</button><label><input id="follow" type="checkbox" checked>Follow active step</label><a href="index.html">Detailed lab</a><a href="loop.html" aria-current="page">Continuous flowchart</a></div>
+<div class="vectors"><div class="vector"><div><strong>Current x · solution being improved</strong><div class="samples" id="x-values"></div></div><svg class="spark" id="x-plot" viewBox="0 0 150 50" aria-label="Current solution profile" role="img"></svg></div><div class="vector"><div><strong>True x* · reference only</strong><div class="samples" id="exact-values"></div></div><svg class="spark" id="exact-plot" viewBox="0 0 150 50" aria-label="Exact reference solution profile" role="img"></svg></div></div>
+<div class="metrics"><span id="status">Ready · paused</span><span>True relative residual <b id="residual">not checked</b></span><span>Optical MVMs <b id="optical">0</b></span><span>Digital MVMs <b id="digital">0</b></span><span id="iteration">Outer 0 · PCG 0</span></div>
+<div class="legend"><span><i style="background:#7ddbd2"></i>Electrical data / CPU control</span><span><i style="background:#ffc067"></i>Light: encoder → selected A → detector</span><span>Click any operation for its meaning. Matrix weights stay fixed.</span></div></header>
+<main><svg id="map" class="map" role="group" aria-label="Connected outer correction, PCG, multigrid and optical feedback flowchart"></svg></main>
+<div class="caption" aria-live="polite"><div><button id="live" hidden>Back to live</button><h2 id="caption-title">Ready · CPU holds the starting guess</h2><p id="caption-body">The CPU checks x, builds a correction using PCG and multigrid, adds it to x, then checks again. Only smoothing uses optical matrix multiplication.</p></div><div class="value"><code id="formula">A₀x = b</code><small id="values">x is the full solution. The optical vector eℓ is a local correction estimate.</small></div></div>
+<dialog id="matrix-dialog"><button class="close" id="close-dialog">Close</button><h2>Fixed matrices in this solve</h2><p>A₀, A₁ and A₂ have optical smoothing boxes and CPU copies. A₃ is solved directly on CPU. R restricts a residual; P expands a correction. All matrices remain unchanged; only vectors change.</p><select id="matrix-choice" aria-label="Matrix to inspect"></select><p id="matrix-meta"></p><pre id="matrix-grid"></pre><p>Showing first 8 rows and 8 columns when larger. Entries come directly from the solver’s sparse matrices. Aℓ₊₁ = Rℓ Aℓ Pℓ and Rℓ = Pℓᵀ.</p></dialog>
+<script id="solver-data" type="application/json">{"N":64,"h":0.015384615384615385,"b":[422500.99999999994,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],"levels":[{"A":{"rows":64,"cols":64,"ptr":[0,2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59,62,65,68,71,74,77,80,83,86,89,92,95,98,101,104,107,110,113,116,119,122,125,128,131,134,137,140,143,146,149,152,155,158,161,164,167,170,173,176,179,182,185,188,190],"idx":[0,1,0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7,8,7,8,9,8,9,10,9,10,11,10,11,12,11,12,13,12,13,14,13,14,15,14,15,16,15,16,17,16,17,18,17,18,19,18,19,20,19,20,21,20,21,22,21,22,23,22,23,24,23,24,25,24,25,26,25,26,27,26,27,28,27,28,29,28,29,30,29,30,31,30,31,32,31,32,33,32,33,34,33,34,35,34,35,36,35,36,37,36,37,38,37,38,39,38,39,40,39,40,41,40,41,42,41,42,43,42,43,44,43,44,45,44,45,46,45,46,47,46,47,48,47,48,49,48,49,50,49,50,51,50,51,52,51,52,53,52,53,54,53,54,55,54,55,56,55,56,57,56,57,58,57,58,59,58,59,60,59,60,61,60,61,62,61,62,63,62,63],"val":[8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0,-4225.0,-4225.0,8450.0]},"P":{"rows":64,"cols":22,"ptr":[0,1,3,5,6,8,10,11,13,15,16,18,20,21,23,25,26,28,30,31,33,35,36,38,40,41,43,45,46,48,50,51,53,55,56,58,60,61,63,65,66,68,70,71,73,75,76,78,80,81,83,85,86,88,90,91,93,95,96,98,100,101,103,105,106],"idx":[0,1,0,0,1,1,2,1,1,2,2,3,2,2,3,3,4,3,3,4,4,5,4,4,5,5,6,5,5,6,6,7,6,6,7,7,8,7,7,8,8,9,8,8,9,9,10,9,9,10,10,11,10,10,11,11,12,11,11,12,12,13,12,12,13,13,14,13,13,14,14,15,14,14,15,15,16,15,15,16,16,17,16,16,17,17,18,17,17,18,18,19,18,18,19,19,20,19,19,20,20,21,20,20,21,21],"val":[0.4472135954999579,0.15629187911970563,0.4459765284628804,0.29896710835802365,0.34909238733904174,0.5715508798328155,0.18312803968557292,0.41502167776749654,0.22277132728571863,0.37562669516696656,0.5769051614596982,0.19044943706277773,0.39371625961876416,0.20136855546397414,0.3821995036921446,0.5773184039997586,0.19239384262073328,0.38685393383743927,0.1951427068610054,0.38387283670818584,0.577347973539188,0.19285793374039328,0.38495074145897024,0.19348074212385227,0.3842642147116093,0.5773500353274861,0.19295800341748276,0.38449140049414576,0.19308701531181674,0.38434763914860715,0.5773502330766053,0.1929779127088869,0.38439209435794197,0.19300282959057635,0.3843641103699442,0.5773502627406127,0.19298163740016705,0.38437232529346255,0.19298619618317694,0.38436717470241977,0.5773502680387269,0.19298230215138207,0.384368626304081,0.19298310111495545,0.38436771936800007,0.5773502689897502,0.192982418308813,0.3843679661085747,0.19298255095092368,0.3843678149860231,0.5773502691518518,0.19298244977197174,0.38436785075047597,0.1929824543717082,0.3843678455048505,0.5773502691575128,0.19298252814482506,0.3843678195420346,0.19298242359250486,0.38436793874195413,0.577350269029083,0.19298297133218542,0.3843677419460912,0.19298232970676685,0.3843684709136518,0.5773502682605395,0.19298548472520524,0.3843673031913487,0.19298179386563277,0.38437147768784696,0.577350263947226,0.19299913707482325,0.3843648147956672,0.1929787662334328,0.3843877245389198,0.5773502398100374,0.19306920053397175,0.38435129611678187,0.192962404669764,0.38447051622147077,0.5773500835195801,0.19340297329801687,0.3842818768309807,0.19287898701126194,0.38486090903208603,0.577348525156177,0.194846961226532,0.3839502995527996,0.19248476508912676,0.38652147786017976,0.5773260664628272,0.20043293495283274,0.3824997554761288,0.19079167892285318,0.3927286423274312,0.5769967769753362,0.22043893441426463,0.37664444552122234,0.18421452093803803,0.4130158415431284,0.5724215362065125,0.29597916655685297,0.3522739938048032,0.15919021640159467,0.44884555978498697,0.4500096344198895]},"R":{"rows":22,"cols":64,"ptr":[0,3,8,13,18,23,28,33,38,43,48,53,58,63,68,73,78,83,88,93,98,103,106],"idx":[0,1,2,1,2,3,4,5,4,5,6,7,8,7,8,9,10,11,10,11,12,13,14,13,14,15,16,17,16,17,18,19,20,19,20,21,22,23,22,23,24,25,26,25,26,27,28,29,28,29,30,31,32,31,32,33,34,35,34,35,36,37,38,37,38,39,40,41,40,41,42,43,44,43,44,45,46,47,46,47,48,49,50,49,50,51,52,53,52,53,54,55,56,55,56,57,58,59,58,59,60,61,62,61,62,63],"val":[0.4472135954999579,0.4459765284628804,0.29896710835802365,0.15629187911970563,0.34909238733904174,0.5715508798328155,0.41502167776749654,0.22277132728571863,0.18312803968557292,0.37562669516696656,0.5769051614596982,0.39371625961876416,0.20136855546397414,0.19044943706277773,0.3821995036921446,0.5773184039997586,0.38685393383743927,0.1951427068610054,0.19239384262073328,0.38387283670818584,0.577347973539188,0.38495074145897024,0.19348074212385227,0.19285793374039328,0.3842642147116093,0.5773500353274861,0.38449140049414576,0.19308701531181674,0.19295800341748276,0.38434763914860715,0.5773502330766053,0.38439209435794197,0.19300282959057635,0.1929779127088869,0.3843641103699442,0.5773502627406127,0.38437232529346255,0.19298619618317694,0.19298163740016705,0.38436717470241977,0.5773502680387269,0.384368626304081,0.19298310111495545,0.19298230215138207,0.38436771936800007,0.5773502689897502,0.3843679661085747,0.19298255095092368,0.192982418308813,0.3843678149860231,0.5773502691518518,0.38436785075047597,0.1929824543717082,0.19298244977197174,0.3843678455048505,0.5773502691575128,0.3843678195420346,0.19298242359250486,0.19298252814482506,0.38436793874195413,0.577350269029083,0.3843677419460912,0.19298232970676685,0.19298297133218542,0.3843684709136518,0.5773502682605395,0.3843673031913487,0.19298179386563277,0.19298548472520524,0.38437147768784696,0.577350263947226,0.3843648147956672,0.1929787662334328,0.19299913707482325,0.3843877245389198,0.5773502398100374,0.38435129611678187,0.192962404669764,0.19306920053397175,0.38447051622147077,0.5773500835195801,0.3842818768309807,0.19287898701126194,0.19340297329801687,0.38486090903208603,0.577348525156177,0.3839502995527996,0.19248476508912676,0.194846961226532,0.38652147786017976,0.5773260664628272,0.3824997554761288,0.19079167892285318,0.20043293495283274,0.3927286423274312,0.5769967769753362,0.37664444552122234,0.18421452093803803,0.22043893441426463,0.4130158415431284,0.5724215362065125,0.3522739938048032,0.15919021640159467,0.29597916655685297,0.44884555978498697,0.4500096344198895]}},{"A":{"rows":22,"cols":22,"ptr":[0,2,5,8,11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,56,59,62,64],"idx":[0,1,0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7,8,7,8,9,8,9,10,9,10,11,10,11,12,11,12,13,12,13,14,13,14,15,14,15,16,15,16,17,16,17,18,17,18,19,18,19,20,19,20,21,20,21],"val":[1313.95231941575,-401.5634631875811,-401.56346318758096,938.691998518896,-466.91273948092913,-466.91273948092913,938.8361534237819,-469.23576454149145,-469.2357645414915,938.8839209183677,-469.4318327956304,-469.4318327956304,938.8984176791914,-469.44938719547014,-469.4493871954701,938.9021810826398,-469.45127362684684,-469.4512736268469,938.9030383496689,-469.4515630426587,-469.45156304265873,938.903215473818,-469.4516163910459,-469.4516163910459,938.9032495287347,-469.45162634623745,-469.45162634623745,938.9032557268882,-469.4516281340898,-469.45162813408984,938.9032567859074,-469.45162840393664,-469.4516284039366,938.9032568229039,-469.4516282064496,-469.4516282064495,938.9032559837844,-469.4516267652542,-469.4516267652542,938.903250972022,-469.45161865408426,-469.45161865408437,938.903223157559,-469.4515748253437,-469.4515748253437,938.9030766612559,-469.4513371098021,-469.4513371098021,938.9023556386703,-469.44982160374525,-469.44982160374525,938.8991164325308,-469.4359337723707,-469.4359337723706,938.8862281959961,-469.2752973201347,-469.2752973201347,938.8417633720608,-467.2336993978249,-467.2336993978249,938.6985642732714,-400.7852578329136,-400.78525783291354,1324.460720573802]},"P":{"rows":22,"cols":8,"ptr":[0,1,3,5,6,8,10,11,13,15,16,18,20,21,23,25,26,28,30,31,33,35,36],"idx":[0,1,0,0,1,1,2,1,1,2,2,3,2,2,3,3,4,3,3,4,4,5,4,4,5,5,6,5,5,6,6,7,6,6,7,7],"val":[0.30556520514022156,0.18099756994902172,0.40815189599678303,0.3130756211719514,0.3759705433996323,0.5766892581002157,0.19334371542887277,0.39476235488533906,0.2009648014193231,0.38379567833686096,0.5773493548158697,0.19347345203179386,0.38400523207049975,0.1935566691565218,0.38387556060336925,0.5773502638482223,0.19347462428556275,0.3838768129177348,0.1934747217554483,0.38387665790775855,0.5773502648843072,0.19354216389327925,0.3838756554704711,0.19347360796214877,0.38398274907211405,0.5773495219263161,0.20003802577069874,0.38380983484953746,0.19336648860915895,0.3935003047791785,0.576828435235186,0.31124593850180854,0.37700876395350075,0.18251072801392684,0.4106109384900758,0.307809198294533]},"R":{"rows":8,"cols":22,"ptr":[0,3,8,13,18,23,28,33,36],"idx":[0,1,2,1,2,3,4,5,4,5,6,7,8,7,8,9,10,11,10,11,12,13,14,13,14,15,16,17,16,17,18,19,20,19,20,21],"val":[0.30556520514022156,0.40815189599678303,0.3130756211719514,0.18099756994902172,0.3759705433996323,0.5766892581002157,0.39476235488533906,0.2009648014193231,0.19334371542887277,0.38379567833686096,0.5773493548158697,0.38400523207049975,0.1935566691565218,0.19347345203179386,0.38387556060336925,0.5773502638482223,0.3838768129177348,0.1934747217554483,0.19347462428556275,0.38387665790775855,0.5773502648843072,0.3838756554704711,0.19347360796214877,0.19354216389327925,0.38398274907211405,0.5773495219263161,0.38380983484953746,0.19336648860915895,0.20003802577069874,0.3935003047791785,0.576828435235186,0.37700876395350075,0.18251072801392684,0.31124593850180854,0.4106109384900758,0.307809198294533]}},{"A":{"rows":8,"cols":8,"ptr":[0,2,5,8,11,14,17,20,22],"idx":[0,1,0,1,2,1,2,3,2,3,4,3,4,5,4,5,6,5,6,7,6,7],"val":[151.5898710502331,-25.182423174128875,-25.18242317412887,104.69211918761596,-52.0979997635963,-52.09799976359628,104.32800740615698,-52.164088918963145,-52.16408891896314,104.32848899321807,-52.16424472982519,-52.164244729825185,104.32848974749908,-52.16411686452558,-52.1641168645256,104.32807587303856,-52.11133963446459,-52.1113396344646,104.64184174083198,-25.125337131205196,-25.12533713120518,153.96703656957507]},"P":{"rows":8,"cols":3,"ptr":[0,1,3,5,6,8,10,11,12],"idx":[0,1,0,0,1,1,2,1,1,2,2,2],"val":[0.2262867521716418,0.2009928798605991,0.3424252246582661,0.3204874990708233,0.3753160337597821,0.577345238074189,0.24048211973038566,0.37539593457930315,0.2020437048166631,0.4376860200949688,0.48849958856542786,0.16541768902561005]},"R":{"rows":3,"cols":8,"ptr":[0,3,8,12],"idx":[0,1,2,1,2,3,4,5,4,5,6,7],"val":[0.2262867521716418,0.3424252246582661,0.3204874990708233,0.2009928798605991,0.3753160337597821,0.577345238074189,0.37539593457930315,0.2020437048166631,0.24048211973038566,0.4376860200949688,0.48849958856542786,0.16541768902561005]}},{"A":{"rows":3,"cols":3,"ptr":[0,2,5,7],"idx":[0,1,0,1,2,1,2],"val":[15.416338488786995,-1.0943744478828208,-1.0943744478828203,11.670806610532638,-4.846975009450407,-4.84697500945041,17.877887410901423]}}],"omega":[5.9206167319914565e-05,0.0005348267307226085,0.00499991130359745,0.04858137537696082],"reference":{"x":[98.46911242602992,96.93798816569033,95.40662721893963,93.87502958579778,92.34319526626882,90.8111242603472,89.2788165680328,87.74627218932818,86.2134911242376,84.6804733727603,83.14721893489136,81.61372781063315,80.07999999998889,78.54603550295407,77.01183431952543,75.47739644970522,73.94272189349448,72.40781065089085,70.87266272189362,69.33727810650561,67.80165680472882,66.2657988165622,64.72970414200528,63.19337278106025,61.656804733727405,60.12000000000437,58.582958579890345,57.04568047338608,55.50816568049087,53.97041420120316,52.43242603552292,50.89420118345115,49.35573964498805,47.81704142013325,46.27810650888714,44.73893491125057,43.19952662722366,41.65988165680623,40.11999999999852,38.57988165680088,37.039526627213384,35.4989349112362,33.95810650886928,32.4170414201125,30.875739644965982,29.334201183429542,27.792426035502587,26.250414201184892,24.70816568047645,23.16568047337701,21.62295857988632,20.080000000004446,18.536804733731692,16.99337278106828,15.449704142014172,13.905798816569476,12.361656804734618,10.817278106509622,9.272662721894084,7.727810650888009,6.182721893491621,4.637396449704652,3.091834319526827,1.5460355029585024],"relativeResiduals":[1.0,0.0009543645659643799,2.4433177236457614e-06,1.2934341253726942e-08,4.7423340364522345e-11,3.1704180357133085e-13],"relativeResidual":3.1704180357133085e-13,"maxError":2.2751578399038408e-11},"source":"smoother(1).py; PyAMG 5.3.0; seed 0","exact":[98.46911242603551,96.93798816568047,95.4066272189349,93.87502958579881,92.34319526627219,90.81112426035503,89.27881656804733,87.74627218934911,86.21349112426036,84.68047337278107,83.14721893491124,81.61372781065089,80.08,78.54603550295859,77.01183431952663,75.47739644970414,73.94272189349113,72.40781065088757,70.87266272189348,69.33727810650888,67.80165680473372,66.26579881656804,64.72970414201183,63.19337278106509,61.65680473372781,60.12,58.58295857988165,57.04568047337278,55.508165680473375,53.97041420118343,52.43242603550295,50.89420118343195,49.35573964497042,47.817041420118336,46.27810650887574,44.7389349112426,43.19952662721894,41.65988165680473,40.12,38.57988165680473,37.03952662721894,35.4989349112426,33.95810650887574,32.417041420118345,30.875739644970416,29.334201183431947,27.79242603550296,26.25041420118343,24.708165680473375,23.165680473372777,21.622958579881658,20.079999999999995,18.536804733727813,16.993372781065087,15.449704142011834,13.905798816568042,12.361656804733729,10.817278106508871,9.272662721893493,7.727810650887569,6.1827218934911246,4.637396449704136,3.0918343195266274,1.5460355029585744]}</script>
+<script>/* Browser-independent numerical core. No browser or network dependencies. */
+    (function (root) {
+      'use strict';
+      const zeros = n => Array(n).fill(0);
+      const dot = (a, b) => { let s = 0; for (let i = 0; i < a.length; i++)s += a[i] * b[i]; return s; };
+      const norm = a => Math.sqrt(dot(a, a));
+      const axpy = (a, k, b) => a.map((v, i) => v + k * b[i]);
+      const mv = (a, x) => {
+        if (x.length !== a.cols) throw new Error('Matrix/vector dimension mismatch');
+        const y = zeros(a.rows);
+        for (let i = 0; i < a.rows; i++)for (let k = a.ptr[i]; k < a.ptr[i + 1]; k++)y[i] += a.val[k] * x[a.idx[k]];
+        return y;
+      };
+      function direct(a, b) {
+        const n = a.rows, m = Array.from({ length: n }, (_, i) => zeros(n).concat(b[i]));
+        for (let i = 0; i < n; i++)for (let k = a.ptr[i]; k < a.ptr[i + 1]; k++)m[i][a.idx[k]] = a.val[k];
+        for (let k = 0; k < n; k++) {
+          let pivot = k; for (let i = k + 1; i < n; i++)if (Math.abs(m[i][k]) > Math.abs(m[pivot][k])) pivot = i;
+          if (Math.abs(m[pivot][k]) < 1e-30) throw new Error('Singular coarse matrix');
+          [m[k], m[pivot]] = [m[pivot], m[k]];
+          for (let i = k + 1; i < n; i++) { const t = m[i][k] / m[k][k]; for (let j = k; j <= n; j++)m[i][j] -= t * m[k][j]; }
+        }
+        const x = zeros(n); for (let i = n - 1; i >= 0; i--) { let v = m[i][n]; for (let j = i + 1; j < n; j++)v -= m[i][j] * x[j]; x[i] = v / m[i][i]; }
+        return x;
+      }
+      class Solver {
+        constructor(data, initial = 'zero') {
+          this.data = data; this.initial = initial; this.b = data.b.slice(); this.bn = norm(this.b);
+          this.x = initial === 'linear' ? data.exact.map((_, i) => 100 * (1 - (i + 1) / 65)) :
+            initial === 'random' ? Array.from({ length: 64 }, (_, i) => 50 + 40 * Math.sin((i + 1) * 2.39996323)) : zeros(64);
+          this.r = null; this.delta = null; this.s = null; this.p = null; this.z = null; this.q = null;
+          this.alpha = null; this.beta = null; this.rho = null; this.outer = 0; this.inner = 0;
+          this.level = null; this.frames = []; this.flight = null; this.inputPort = null; this.outputPort = null;
+          this.counts = { optical: 0, digital: 0, dac: 0, adc: 0, cycles: 0 }; this.history = []; this.events = 0;
+          this.lastRelative = null; this.innerRelative = null; this.status = 'ready'; this.finished = false;
+          this.generator = this.solve(); this.current = {
+            kind: 'cpu', scope: 'outer', node: 'setup', title: 'Ready to solve',
+            detail: 'The CPU holds A, b, the multigrid hierarchy and the selected initial guess. Run or step through the calculation.',
+            formula: '−u″(t)=1; u(0)=100; u(1)=0', vector: this.x, name: 'x', level: null
+          };
+        }
+        event(kind, scope, node, title, detail, formula, vector = null, name = '', extra = {}) {
+          return { kind, scope, node, title, detail, formula, vector: vector ? vector.slice() : null, name, level: this.level, ...extra };
+        }
+        *cpu(scope, node, title, detail, formula, vector = null, name = '') {
+          yield this.event('cpu', scope, node, title, detail, formula, vector, name);
+        }
+        *digital(a, x, scope, node, matrix, detail) {
+          const y = mv(a, x); this.counts.digital++;
+          yield this.event('cpu', scope, node, 'CPU matrix multiply: ' + matrix, detail,
+            `${matrix} [${a.rows}×${a.cols}] · vector [${x.length}×1] → [${y.length}×1]`, y, 'product');
+          return y;
+        }
+        *optical(l, e, g, phase, sweep) {
+          const a = this.data.levels[l].A, n = a.rows;
+          this.level = l; this.outputPort = e.slice(); this.inputPort = null;
+          this.flight = { level: l, phase, sweep, input: e.slice(), output: null, g: g.slice(), omega: this.data.omega[l] };
+          yield this.event('cpu', 'smooth', 'send', `CPU sends e${l} to lane ${l}`,
+            `The CPU retains the old e and g. Only the electrical output port transmits e to DAC ${l}. The other two optical lanes remain idle.`,
+            `e${l} [${n}×1] → CPU OUT → DAC ${l}`, e, 'e', { phase, sweep });
+          this.counts.dac++;
+          yield this.event('dac', 'smooth', 'convert', `DAC ${l} encodes the vector`,
+            `The electrical vector drives the optical encoder. The laser supplies the carrier. This ideal DAC block includes the modulator.`,
+            `electrical e${l} [${n}×1] → optical e${l} [${n}×1]`, e, 'e', { phase, sweep });
+          const y = mv(a, e); this.counts.optical++; this.flight.output = y.slice();
+          yield this.event('matrix', 'smooth', 'multiply', `Fixed matrix box A${l}`,
+            `A${l} never changes during the solve. The box transforms the encoded vector into A${l}e${l}. No CPU calculation occurs in this optical segment.`,
+            `A${l} [${n}×${n}] × e${l} [${n}×1] = y${l} [${n}×1]`, y, 'y', { phase, sweep });
+          this.counts.adc++; this.inputPort = y.slice();
+          yield this.event('adc', 'smooth', 'read', `ADC ${l} returns the product`,
+            `The detector/ADC converts the result back to an electrical vector. Only this electrical signal reaches the CPU input port.`,
+            `optical y${l} [${n}×1] → ADC ${l} → CPU IN`, y, 'y', { phase, sweep });
+          return y;
+        }
+        *smooth(l, e, g, phase) {
+          for (let k = 1; k <= 3; k++) {
+            const y = yield* this.optical(l, e, g, phase, k);
+            e = axpy(e, this.data.omega[l], axpy(g, -1, y));
+            this.frames[this.frames.length - 1].e = e;
+            yield this.event('cpu', 'smooth', 'update', `CPU completes ${phase}-sweep ${k}/3`,
+              'The CPU subtracts the product from the saved right-hand side, scales by the fixed ω, then adds the saved e. The next sweep waits for this update.',
+              'e ← e + ωℓ(g − y)', e, 'e', { phase, sweep: k });
+          }
+          return e;
+        }
+        *vcycle(l, g) {
+          this.level = l;
+          const n = g.length, frame = { level: l, g: g.slice(), e: zeros(n) }; this.frames.push(frame);
+          if (l === 0) this.counts.cycles++;
+          yield* this.cpu('multigrid', 'enter', `Enter level ${l}: ${n} unknowns`,
+            `The level right-hand side is saved as g${l}. ${l === 3 ? 'This is the smallest system.' : 'The local correction starts at zero.'}`,
+            `g${l} [${n}×1]; e${l}=0`, g, 'g');
+          let e;
+          if (l === this.data.levels.length - 1) {
+            e = direct(this.data.levels[l].A, g); frame.e = e;
+            yield* this.cpu('multigrid', 'coarse', 'CPU solves the 3×3 system directly',
+              'The coarse solve is digital. It does not send a vector to a laser or form an explicit inverse.',
+              'A₃ e₃ = g₃', e, 'e');
+          } else {
+            e = yield* this.smooth(l, frame.e, g, 'pre');
+            this.level = l;
+            const ae = yield* this.digital(this.data.levels[l].A, e, 'multigrid', 'residual', `A${l}`,
+              'This residual MVM uses the CPU copy of A. It is separate from the optical smoothing MVM, even though the matrix is the same.');
+            const d = axpy(g, -1, ae);
+            yield* this.cpu('multigrid', 'residual', 'CPU forms the remaining level residual',
+              'Keep the pre-smoothed e for the return path. The residual will be transferred to the next smaller level.',
+              `d${l} = g${l} − A${l}e${l}`, d, 'd');
+            const gc = yield* this.digital(this.data.levels[l].R, d, 'multigrid', 'restrict', `R${l}=P${l}ᵀ`,
+              'Restriction compresses the residual. This matrix is fixed and the multiplication remains digital.');
+            const ec = yield* this.vcycle(l + 1, gc);
+            this.level = l;
+            const c = yield* this.digital(this.data.levels[l].P, ec, 'multigrid', 'prolong', `P${l}`,
+              'Prolongation expands the coarse correction back to this level. The saved fine-level vector has been waiting in CPU memory.');
+            e = axpy(e, 1, c); frame.e = e;
+            yield* this.cpu('multigrid', 'correct', 'CPU adds the coarse correction',
+              'The coarse result is added to the retained pre-smoothed vector. Three post-smoothing sweeps follow.',
+              'e ← e + Pℓ ec', e, 'e');
+            e = yield* this.smooth(l, e, g, 'post');
+          }
+          yield* this.cpu('multigrid', 'return', `Return correction from level ${l}`,
+            l === 0 ? 'At the finest level, this vector becomes z in PCG.' : 'The parent level now receives its coarse correction.',
+            l === 0 ? 'z = e₀' : 'return eℓ', e, 'e');
+          this.frames.pop(); this.level = this.frames.length ? this.frames[this.frames.length - 1].level : null;
+          return e;
+        }
+        *pcg(rhs) {
+          const rhsNorm = norm(rhs);
+          this.delta = zeros(rhs.length); this.inner = 0; this.innerRelative = null; this.alpha = null; this.beta = null;
+          const a0delta = yield* this.digital(this.data.levels[0].A, this.delta, 'pcg', 'init', 'A₀',
+            'The source code evaluates A₀δ even when δ=0. This zero-input MVM is retained for faithful accounting.');
+          this.s = axpy(rhs, -1, a0delta);
+          yield* this.cpu('pcg', 'init', 'CPU starts a correction solve',
+            'The outer r is fixed for this PCG call. δ accumulates the correction; s tracks what the correction has not yet removed.',
+            'δ=0; s=r−A₀δ', this.s, 's');
+          this.z = yield* this.vcycle(0, this.s); this.p = this.z.slice(); this.rho = dot(this.s, this.z);
+          yield* this.cpu('pcg', 'direction', 'CPU chooses the first search direction',
+            'The first direction is the multigrid suggestion. ρ is a scalar dot product, not another MVM.',
+            'p=z; ρ=sᵀz', this.p, 'p');
+          for (let k = 0; k < 20; k++) {
+            this.inner = k + 1; this.level = null;
+            this.q = yield* this.digital(this.data.levels[0].A, this.p, 'pcg', 'mvm', 'A₀',
+              'q tells the CPU how a step along p will change the residual. This high-precision MVM remains digital.');
+            const denom = dot(this.p, this.q); this.alpha = this.rho / denom;
+            if (!Number.isFinite(this.alpha) || !(denom > 0)) throw new Error('PCG numerical breakdown: invalid step size');
+            yield* this.cpu('pcg', 'alpha', 'CPU calculates the step size α',
+              'p chooses a direction; α chooses how far to move. It depends on q, so it is calculated after A₀p. A single scalar scales the whole vector.',
+              'α = (sᵀz) / (pᵀq)', this.q, 'q');
+            this.delta = axpy(this.delta, this.alpha, this.p); this.s = axpy(this.s, -this.alpha, this.q);
+            yield* this.cpu('pcg', 'update', 'CPU updates δ and s',
+              'These two vector updates can overlap in hardware after α is ready. This simulator executes them together as one CPU step, with no extra MVM.',
+              'δ ← δ + αp; s ← s − αq', this.s, 's');
+            this.innerRelative = norm(this.s) / rhsNorm;
+            yield* this.cpu('pcg', 'check', 'CPU checks the inner residual',
+              this.innerRelative < 1e-2 ? 'The correction is accurate enough for this outer step. Return δ to the outer loop.' : 'The remaining mismatch is still too large. Another V-cycle will suggest a new search direction.',
+              '‖s‖₂ / ‖r‖₂ < 10⁻² ?', this.s, 's');
+            if (this.innerRelative < 1e-2) return this.delta.slice();
+            this.z = yield* this.vcycle(0, this.s);
+            const next = dot(this.s, this.z); this.beta = next / this.rho;
+            this.p = axpy(this.z, this.beta, this.p); this.rho = next;
+            yield* this.cpu('pcg', 'direction', 'CPU updates the search direction',
+              'The new multigrid suggestion is combined with the saved direction. As in the source, this work is still done on a final capped iteration.',
+              'β = (snewᵀznew)/(soldᵀzold); p ← z + βp', this.p, 'p');
+          }
+          return this.delta.slice();
+        }
+        *solve() {
+          yield* this.cpu('outer', 'setup', 'CPU loads the fixed system',
+            'The hierarchy and Richardson weights were generated digitally from the supplied Python code. Setup is complete before the displayed MVM counts begin.',
+            'N=64; h=1/65; A₀=h⁻² tridiag(−1,2,−1)', this.x, 'x');
+          for (let k = 0; k < 10; k++) {
+            this.outer = k + 1; this.inner = 0; this.level = null;
+            const ax = yield* this.digital(this.data.levels[0].A, this.x, 'outer', 'residual', 'A₀',
+              'The CPU recomputes the true residual from the full solution estimate. This resets accumulated inner-solver error.');
+            this.r = axpy(this.b, -1, ax); this.lastRelative = norm(this.r) / this.bn;
+            this.history.push({ step: k, relative: this.lastRelative });
+            yield* this.cpu('outer', 'check', 'CPU checks the true residual',
+              this.lastRelative < 1e-12 ? 'The true residual passes the requested tolerance. No new optical work is needed.' : 'The solution still needs a correction. PCG will approximately solve A₀δ=r.',
+              '‖b − A₀x‖₂ / ‖b‖₂ < 10⁻¹² ?', this.r, 'r');
+            if (this.lastRelative < 1e-12) {
+              this.status = 'converged';
+              yield* this.cpu('outer', 'stop', 'Converged — CPU stops the loop',
+                'The CPU returns the 64 interior solution values and retains the boundary values 100 and 0. The laser lanes are idle.',
+                'output x; stop dispatching MVMs', this.x, 'x');
+              return this.result();
+            }
+            yield* this.cpu('outer', 'correction', 'CPU calls PCG',
+              'The current residual is the right-hand side of a smaller-accuracy correction solve. The outer x is saved in memory.',
+              'approximately solve A₀δ = r', this.r, 'r');
+            const d = yield* this.pcg(this.r);
+            this.x = axpy(this.x, 1, d); this.level = null;
+            yield* this.cpu('outer', 'update', 'CPU updates the full solution',
+              'Add the accumulated PCG correction. The next outer step checks the true residual again before deciding whether to continue.',
+              'x ← x + δ', this.x, 'x');
+          }
+          const ax = yield* this.digital(this.data.levels[0].A, this.x, 'outer', 'residual', 'A₀',
+            'Final verification at the outer limit. This extra check avoids reporting a capped result as converged.');
+          this.r = axpy(this.b, -1, ax); this.lastRelative = norm(this.r) / this.bn;
+          this.history.push({ step: 10, relative: this.lastRelative });
+          this.status = this.lastRelative < 1e-12 ? 'converged' : 'limit';
+          yield* this.cpu('outer', 'stop', this.status === 'converged' ? 'Converged' : 'Iteration limit reached',
+            this.status === 'converged' ? 'The final true residual passes the tolerance.' : 'The CPU returns the current approximation, which has not reached the requested tolerance.',
+            'stop dispatching MVMs', this.x, 'x');
+          return this.result();
+        }
+        result() {
+          return {
+            x: this.x.slice(), status: this.status, relativeResidual: this.lastRelative,
+            maxError: Math.max(...this.x.map((x, i) => Math.abs(x - this.data.exact[i]))), counts: { ...this.counts }, history: this.history.slice()
+          };
+        }
+        next() {
+          if (this.finished) return { done: true, value: this.result() };
+          if (this.status === 'ready') this.status = 'running';
+          try {
+            const out = this.generator.next();
+            if (out.done) { this.finished = true; return out; }
+            this.current = out.value; this.events++; return out;
+          } catch (error) {
+            this.status = 'error'; this.finished = true;
+            this.current = this.event('cpu', 'outer', 'stop', 'Numerical error', error.message, 'No success was reported.');
+            return { done: true, value: { ...this.result(), error: error.message } };
+          }
+        }
+        complete() { let guard = 0; while (!this.finished && guard++ < 20000) this.next(); if (!this.finished) throw new Error('Event limit exceeded'); return this.result(); }
+      }
+      root.PhotonicSolver = { Solver, mv, dot, norm, direct };
+      if (typeof module !== 'undefined') module.exports = root.PhotonicSolver;
+    })(typeof globalThis !== 'undefined' ? globalThis : this);
+  </script>
+<script>
+(()=>{'use strict';
+const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
+const controls=document.querySelector('.controls');document.querySelector('main').before(controls);
+const data=JSON.parse($('solver-data').textContent), {Solver}=PhotonicSolver;
+let solver=new Solver(data),playing=false,progress=1,lastTime=0,raf=0,current='check',previous='check',activePath=null,inspection=null;
+const reduced=matchMedia('(prefers-reduced-motion: reduce)'),mobile=matchMedia('(max-width:700px)');
+const definitions=[
+['check',50,50,'CPU · outer loop','Check the full solution','r = b − A₀x; ‖r‖ / ‖b‖ < 10⁻¹² ?','If yes: stop. Otherwise build a correction.','The true residual measures how closely the current solution satisfies the equations. It is recomputed digitally from the full x after every correction.'],
+['init',50,200,'CPU · PCG begins','Start a correction solve','A₀δ ≈ r; δ = 0; s = r − A₀δ','Outer x waits unchanged in CPU memory.','PCG approximately solves for a correction δ, using the outer residual r as its right-hand side. The inner residual s measures what δ has not yet corrected.'],
+['direction',50,350,'CPU · PCG direction','Choose a search direction','First: p = z; ρ = sᵀz','Later: β = ρnew / ρold; p = z + βp','The V-cycle returns z, a suggestion for the correction. PCG combines it with the previous direction to form p. These dot products and vector sums are digital.'],
+['alpha',50,500,'CPU · accurate MVM + scalar','Choose the step size','q = A₀p; α = ρ / (pᵀq)','This A₀ multiplication remains digital.','The CPU computes how p changes the equations, then chooses the scalar α. This high-precision MVM is distinct from optical smoothing, even though it uses the same A₀.'],
+['update',50,650,'CPU · PCG vector updates','Improve the correction','δ ← δ + αp; s ← s − αq','δ changes here; full x still waits.','The CPU accumulates δ and updates the remaining inner residual s. No light or matrix multiplication is needed for these vector updates.'],
+['inner',50,800,'CPU · inner stopping test','Is this correction sufficient?','‖s‖ / ‖r‖ < 10⁻² ?','Yes: return δ. No: another V-cycle.','The correction solve uses a looser tolerance than the full solution. A new V-cycle is applied to the new inner residual if this test fails; PCG is capped at 20 iterations.'],
+['outer',50,950,'CPU · outer vector update','Update the full solution','x ← x + δ','Return to the true residual check.','Only now does the full solution estimate x change. The CPU checks the true residual again before it requests another correction. The outer loop is capped at 10 corrections.'],
+['stop',550,50,'CPU · terminal state','Return the solution','x contains 64 interior values','Boundary values remain 100 and 0.','Successful completion requires a fresh true relative residual below 10⁻¹². Iteration limits and numerical errors are reported separately. No further optical requests are dispatched.'],
+['enter',550,200,'CPU · multigrid V-cycle','Enter the active grid level','g₀ = s; eℓ = 0 at each new level','64 → 22 → 8 → 3 → 8 → 22 → 64','At each level, g is its right-hand side and e its local correction estimate. The parent correction is saved during recursion. At 3 unknowns, the CPU solves directly.'],
+['send',550,350,'CPU · smoothing dispatch','Send the current local vector','CPU OUT: eℓ → encoder / DAC','Save gℓ and eℓ; select only one Aℓ.','Each pre- or post-smoothing sweep sends the current e to the encoder. The CPU retains g, e and ω for the update after detection. Three sweeps run per phase.'],
+['smooth',550,500,'CPU · Richardson update','Use the detected product','eℓ ← eℓ + ωℓ(gℓ − yℓ)','yℓ = Aℓeℓ; repeat 3 sweeps per phase.','The detector returns y. The CPU subtracts y from saved g, scales by ω and adds saved e. The next optical sweep uses this updated vector.'],
+['restrict',550,650,'CPU · move to a coarser grid','Restrict the remaining residual','dℓ = gℓ − Aℓeℓ; gℓ₊₁ = Rℓdℓ','Save eℓ, then enter the smaller level.','Both the residual MVM with the CPU copy of A and the restriction R are digital. R maps 64→22, 22→8 or 8→3; it does not change during the solve.'],
+['coarse',550,800,'CPU · 3 unknowns','Solve the smallest system','A₃e₃ = g₃','Direct digital solve; no optical box.','The deliberately tiny 3×3 system is solved directly by Gaussian elimination with pivoting. No explicit inverse or optical multiply is used.'],
+['prolong',550,950,'CPU · return to the finer grid','Add the coarse correction','eℓ ← saved eℓ + Pℓeℓ₊₁','Then run 3 post-smoothing sweeps.','P expands the returned coarse correction. The CPU adds it to the saved fine estimate, selects the finer optical matrix, then performs three post-smoothing sweeps.'],
+['return',550,1100,'CPU · V-cycle return','Return the level correction','Level 0: z = e₀ → PCG','Other levels: eℓ → parent level.','After post-smoothing, each level returns its correction to its parent. The finest return becomes PCG’s preconditioned residual z.'],
+['laser',1040,200,'Optical carrier','Laser source','Carrier supplies the encoder','Light carries e only after encoding.','The source supplies an optical carrier. Encoding defines the vector carried by that light. Brightness and animation speed do not represent signed values or physical timing.'],
+['encoder',1040,350,'Electrical → optical','Encoder / DAC','Electrical eℓ → optical eℓ','CPU determines what is sent next.','This functional block includes DAC and modulation. Only the selected level receives the encoded local estimate eℓ. Exact physical encoding and switching technology are unspecified.'],
+['a0',1020,500,'Optical · level 0','A₀','64 × 64','Fixed weights','The fixed finest-grid matrix acts on e₀. This is ideal numerical simulation of the optical MVM, not a measured device.'],
+['a1',1145,500,'Optical · level 1','A₁','22 × 22','Fixed weights','The fixed first coarse optical matrix acts on e₁. A₁ = R₀A₀P₀.'],
+['a2',1270,500,'Optical · level 2','A₂','8 × 8','Fixed weights','The fixed second coarse optical matrix acts on e₂. A₂ = R₁A₁P₁.'],
+['detector',1040,650,'Optical → electrical','Detector / ADC','Optical yℓ → CPU IN','Return yℓ = Aℓeℓ, not updated eℓ.','Detection and ADC return the measured product to the CPU. The CPU must update e before the encoder sends the next vector. Light never propagates through the CPU.']
+];
+const nodes={},edges=[];
+function el(tag,attrs={},text){const e=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);if(text!==undefined)e.textContent=text;return e;}
+function add(a,b,label='',route='',optical=false){edges.push({a,b,label,route,optical});}
+add('check','init','needs correction');add('check','stop','tolerance met');add('init','enter','V(s)');add('direction','alpha');add('alpha','update');add('update','inner');add('inner','outer','yes, or PCG cap');add('outer','check','check x again','outer');add('inner','enter','no: V(new s)','pcg');add('return','direction','z → PCG','return');
+add('enter','send','levels 0–2');add('enter','coarse','level 3','coarse');add('send','encoder','electrical eℓ');add('laser','encoder','carrier', '',true);
+for(const a of ['a0','a1','a2']){add('encoder',a,'','fan',true);add(a,'detector','','fan',true);}
+add('detector','smooth','electrical yℓ','detected');add('smooth','send','next sweep','repeat');add('smooth','restrict','pre phase done');add('restrict','enter','next coarser level','descend');add('restrict','coarse','8 → 3');add('coarse','return','return e₃','coarseReturn');add('return','prolong','coarse e → parent','parent');add('prolong','send','post-smooth at finer level','post');add('smooth','return','post phase done','smoothReturn');
+function layout(){
+ const svg=$('map');svg.replaceChildren();svg.setAttribute('viewBox',mobile.matches?'0 0 520 3500':'0 0 1440 1250');
+ const defs=el('defs');for(const [id,color]of [['arrow','#476075'],['active-arrow','#7ddbd2'],['light-arrow','#ffc067']]){let m=el('marker',{id,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'});m.append(el('path',{d:'M0 0L10 5L0 10Z',fill:color}));defs.append(m);}svg.append(defs);
+ let i=0;
+ for(const d of definitions){let [id,x,y,owner,name,equation,hint,detail]=d;let w=id[0]==='a'&&/^a\d$/.test(id)?115:330,h=112;if(mobile.matches){x=90;y=60+i*155;w=340;i++;if(/^a\d$/.test(id)){x=35+Number(id[1])*150;y=3020;w=140;i--; }if(id==='detector')y=3200;}
+ nodes[id]={id,x,y,w,h,owner,name,equation,hint,detail};}
+ // Separate hardware branches on mobile; preserve the same connected graph.
+ if(mobile.matches){nodes.laser.y=2630;nodes.encoder.y=2820;nodes.a0.y=nodes.a1.y=nodes.a2.y=3020;nodes.detector.y=3220;}
+ const pathGroup=el('g'),labelGroup=el('g');svg.append(pathGroup,labelGroup);
+ for(const edge of edges){let a=nodes[edge.a],b=nodes[edge.b],sx=a.x+a.w/2,sy=a.y+a.h,tx=b.x+b.w/2,ty=b.y;let points;
+ if(mobile.matches){if(b.y>a.y+a.h&&b.y-a.y<250)points=[[sx,sy],[sx,(sy+ty)/2],[tx,(sy+ty)/2],[tx,ty]];else{const lane=edge.route==='outer'?18:edge.route==='pcg'?40:edge.route==='return'?475:edge.route==='detected'?500:edge.route==='post'?460:edge.route==='smoothReturn'?445:edge.route==='parent'?470:edge.route==='descend'?55:edge.route==='coarse'?35:edge.optical?470:60;sy=a.y+a.h/2;ty=b.y+b.h/2;let start=a.x+a.w/2>lane?a.x:a.x+a.w,end=b.x+b.w/2>lane?b.x:b.x+b.w;points=[[start,sy],[lane,sy],[lane,ty],[end,ty]];}}
+ else if(edge.route==='outer')points=[[a.x,a.y+56],[20,a.y+56],[20,b.y+56],[b.x,b.y+56]];
+ else if(edge.route==='pcg')points=[[a.x+a.w,a.y+56],[450,a.y+56],[450,b.y+56],[b.x,b.y+56]];
+ else if(edge.route==='return')points=[[a.x,a.y+56],[415,a.y+56],[415,b.y+56],[b.x+b.w,b.y+56]];
+ else if(edge.route==='coarse')points=[[a.x,a.y+56],[505,a.y+56],[505,b.y+56],[b.x,b.y+56]];
+ else if(edge.route==='detected')points=[[a.x,a.y+56],[975,a.y+56],[975,b.y+56],[b.x+b.w,b.y+56]];
+ else if(['post','smoothReturn','parent','coarseReturn'].includes(edge.route)){let lane={post:930,smoothReturn:900,parent:955,coarseReturn:910}[edge.route];points=[[a.x+a.w,a.y+56],[lane,a.y+56],[lane,b.y+56],[b.x+b.w,b.y+56]];}
+ else if(['repeat','descend'].includes(edge.route)){let lane=edge.route==='repeat'?530:480;points=[[a.x,a.y+56],[lane,a.y+56],[lane,b.y+56],[b.x,b.y+56]];}
+ else if(edge.route==='fan'){points=[[sx,sy],[sx,(sy+ty)/2],[tx,(sy+ty)/2],[tx,ty]];}
+ else if(a.y===b.y)points=[[a.x+a.w,a.y+56],[b.x,b.y+56]];
+ else points=[[sx,sy],[sx,(sy+ty)/2],[tx,(sy+ty)/2],[tx,ty]];
+ edge.path=el('path',{d:points.map((p,i)=>(i?'L':'M')+p.join(',')).join(' '),class:'edge'+(edge.optical?' optical':''),'marker-end':'url(#arrow)'});pathGroup.append(edge.path);
+ if(edge.label){let p=points.length>2?points[1]:points[0],q=points.length>2?points[2]:points[1];let x=(p[0]+q[0])/2,y=(p[1]+q[1])/2;const vertical=p[0]===q[0];edge.labelEl=el('text',{x:x+(vertical?7:0),y:y-(vertical?0:8),class:'edge-label'+(edge.route?' secondary':''),'text-anchor':vertical?'start':'middle'},edge.label);labelGroup.append(edge.labelEl);}}
+ for(const n of Object.values(nodes)){let small=/^a\d$/.test(n.id),g=el('g',{class:'node'+(small||n.id==='laser'?' optical':'')+(small?' layer':''),transform:`translate(${n.x} ${n.y})`,tabindex:0,role:'button','aria-label':n.name+'; '+n.equation,'data-node':n.id});g.append(el('rect',{width:n.w,height:n.h,class:'box'}));g.append(el('text',{x:small?10:17,y:22,class:'owner'},small?'Optical · '+n.id[1]:n.owner));g.append(el('text',{x:small?10:17,y:48,class:'name'},n.name));g.append(el('text',{x:small?10:17,y:73,class:'equation'},n.equation));g.append(el('text',{x:small?10:17,y:96,class:'hint'},n.hint));g.addEventListener('click',()=>inspect(n.id));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inspect(n.id);}});svg.append(g);n.element=g;}
+ const note=el('text',{x:mobile.matches?90:1040,y:mobile.matches?3420:850,class:'lane-label'});for(const[t,k]of [['Optical boxes are selected, never chained.',0],['Only one level receives a vector at a time.',1],['A₃, Rℓ, Pℓ and PCG stay on CPU.',2],['Light is a carrier, not the CPU control token.',3]])note.append(el('tspan',{x:mobile.matches?90:1040,dy:k?25:0},t));svg.append(note);
+ const packet=el('circle',{id:'packet',r:7,class:'packet',visibility:'hidden'});svg.append(packet);svg.append(el('circle',{id:'carrier',r:6,class:'packet light',visibility:'hidden'}));render();
+}
+function mapEvent(c){if(solver.finished||c.node==='stop')return'stop';if(c.kind==='dac')return'encoder';if(c.kind==='matrix')return'a'+c.level;if(c.kind==='adc')return'detector';if(c.scope==='outer')return({setup:'check',residual:'check',check:'check',correction:'init',update:'outer'})[c.node]||'check';if(c.scope==='pcg')return({init:'init',direction:'direction',mvm:'alpha',alpha:'alpha',update:'update',check:'inner'})[c.node]||'init';if(c.scope==='smooth')return c.node==='send'?'send':'smooth';return({enter:'enter',coarse:'coarse',residual:'restrict',restrict:'restrict',prolong:'prolong',correct:'prolong',return:'return'})[c.node]||'enter';}
+function fmt(v){return !Number.isFinite(v)?'—':v===0?'0':Math.abs(v)<.001||Math.abs(v)>=10000?v.toExponential(2):Number(v.toPrecision(5)).toString();}
+function samples(name,v){return v?.length?`${name} [${v.length}] = [${v.slice(0,5).map(fmt).join(', ')}, …, ${fmt(v.at(-1))}]`:'No vector transfer in this operation.';}
+function spark(id,v,color){let values=[100,...v,0];$(id).innerHTML='';$(id).append(el('path',{d:'M2 48H148',stroke:'#bed0d9',fill:'none'}));$(id).append(el('polyline',{points:values.map((v,i)=>`${2+i*146/(values.length-1)},${48-v*.44}`).join(' '),fill:'none',stroke:color,'stroke-width':2}));}
+function caption(){const c=solver.current,n=inspection&&nodes[inspection];$('live').hidden=!n;$('caption-title').textContent=n?n.name:solver.events?c.title:'Ready · CPU holds the starting guess';$('caption-body').textContent=n?n.detail:solver.events?c.detail:'The CPU checks x, builds a correction using PCG and multigrid, adds it to x, then checks again. Only smoothing uses optical matrix multiplication.';$('formula').textContent=n?n.equation:c.formula;$('values').textContent=n?'Inspecting this operation; solver state is unchanged.':(solver.flight&&['dac','matrix','adc'].includes(c.kind)?samples(c.kind==='adc'?'y'+c.level:'light input e'+c.level,c.kind==='adc'?solver.flight.output:solver.flight.input):samples(c.name,c.vector))+(c.scope==='outer'&&c.node==='update'?' · Full x just changed.':' · Full x changes only at x ← x + δ.');}
+function render(){
+ for(const n of Object.values(nodes)){n.element?.classList.toggle('active',n.id===current);n.element?.classList.toggle('inspected',n.id===inspection);if(/^a\d$/.test(n.id))n.element?.classList.toggle('inactive',Number(n.id[1])!==solver.level);}
+ for(const e of edges){let active=e===activePath;e.path?.classList.toggle('active',active);e.path?.setAttribute('marker-end',`url(#${active?(e.optical?'light-arrow':'active-arrow'):'arrow'})`);e.labelEl?.classList.toggle('active',active);}
+ $('x-values').textContent=samples('x',solver.x);$('exact-values').textContent=samples('x*',data.exact);spark('x-plot',solver.x,'#7ddbd2');spark('exact-plot',data.exact,'#a8bacb');
+ $('status').textContent=solver.finished?({converged:'Converged',limit:'Iteration limit reached',error:'Numerical error'})[solver.status]:playing?'Playing':solver.events?'Paused':'Ready · paused';$('residual').textContent=solver.lastRelative===null?'not checked':solver.lastRelative.toExponential(4);$('optical').textContent=solver.counts.optical;$('digital').textContent=solver.counts.digital;$('iteration').textContent=`Outer ${solver.outer} · PCG ${solver.inner}${solver.level!==null?' · Level '+solver.level+' ('+data.levels[solver.level].A.rows+')':''}${solver.current.phase?' · '+solver.current.phase+' '+solver.current.sweep+'/3':''}`;$('play').textContent=playing?'Pause':'Play';$('play').disabled=solver.finished;$('next').disabled=solver.finished;caption();drawPacket();
+}
+function drawPacket(){let carrier=$('carrier');if(carrier){let beam=edges.find(e=>e.a==='laser'&&e.b==='encoder');let visible=solver.current.kind==='dac'&&progress<1&&!reduced.matches;carrier.setAttribute('visibility',visible?'visible':'hidden');if(visible){let pos=beam.path.getPointAtLength(beam.path.getTotalLength()*progress);carrier.setAttribute('cx',pos.x);carrier.setAttribute('cy',pos.y);}}let p=$('packet');if(!p)return;if(!activePath||progress>=1||reduced.matches){p.setAttribute('visibility','hidden');return;}let pt=activePath.path.getPointAtLength(activePath.path.getTotalLength()*progress);p.setAttribute('cx',pt.x);p.setAttribute('cy',pt.y);p.setAttribute('class','packet'+(activePath.optical?' light':''));p.setAttribute('visibility','visible');}
+function advance(){if(solver.finished)return;inspection=null;previous=current;solver.next();current=mapEvent(solver.current);activePath=edges.find(e=>e.a===previous&&e.b===current)||null;progress=0;if(solver.finished){playing=false;progress=1;}render();if($('follow').checked&&current!==previous){const r=nodes[current].element.getBoundingClientRect(),top=controls.offsetHeight+15,bottom=innerHeight-document.querySelector('.caption').offsetHeight-15;if(r.top<top||r.bottom>bottom)window.scrollBy({top:r.top-(top+(bottom-top-r.height)/2),behavior:reduced.matches?'instant':'smooth'});}}
+function tick(t){if(!playing)return;const dt=Math.min(80,t-lastTime);lastTime=t;progress=Math.min(1,progress+dt*Number($('speed').value)/(reduced.matches?400:1100));drawPacket();if(progress>=1)advance();if(playing)raf=requestAnimationFrame(tick);}
+function play(){if(solver.finished)return;playing=!playing;cancelAnimationFrame(raf);if(playing){if(progress>=1)advance();lastTime=performance.now();raf=requestAnimationFrame(tick);}render();}
+function next(){if(playing||progress<1){playing=false;cancelAnimationFrame(raf);progress=1;render();return;}advance();playing=true;lastTime=performance.now();let single=t=>{if(!playing)return;let dt=Math.min(80,t-lastTime);lastTime=t;progress=Math.min(1,progress+dt*Number($('speed').value)/1100);drawPacket();if(progress>=1){playing=false;render();}else raf=requestAnimationFrame(single);};raf=requestAnimationFrame(single);render();}
+function reset(){cancelAnimationFrame(raf);playing=false;progress=1;solver=new Solver(data,$('guess').value);previous=current='check';inspection=null;activePath=null;render();}
+function finish(){cancelAnimationFrame(raf);playing=false;inspection=null;solver.complete();current='stop';progress=1;activePath=null;render();return solver.result();}
+function inspect(id){inspection=id;caption();for(const n of Object.values(nodes))n.element?.classList.toggle('inspected',n.id===id);}
+function state(){return {status:solver.status,finished:solver.finished,playing,progress,node:current,event:solver.events,operation:solver.current.title,counts:{...solver.counts},relativeResidual:solver.lastRelative,x:solver.x.slice(),level:solver.level,kind:solver.current.kind};}
+$('play').onclick=play;$('next').onclick=next;$('restart').onclick=reset;$('guess').onchange=reset;$('finish').onclick=finish;$('live').onclick=()=>{inspection=null;render();};$('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch(e){$('caption-body').textContent='Full screen is unavailable in this browser. The flowchart remains usable in this window.';}};
+const matrices=[];data.levels.forEach((l,i)=>{matrices.push(['A'+i,l.A]);if(l.R)matrices.push(['R'+i,l.R]);if(l.P)matrices.push(['P'+i,l.P]);});for(const [name,a]of matrices){let o=document.createElement('option');o.textContent=`${name} · ${a.rows} × ${a.cols}`;$('matrix-choice').append(o);}
+function showMatrix(){let[name,a]=matrices[$('matrix-choice').selectedIndex];$('matrix-meta').textContent=`${name}: ${a.rows} rows × ${a.cols} columns; ${a.val.length} stored nonzero entries. Fixed throughout every iteration.`;let out=[];for(let i=0;i<Math.min(8,a.rows);i++){let row=Array(Math.min(8,a.cols)).fill(0);for(let k=a.ptr[i];k<a.ptr[i+1];k++)if(a.idx[k]<row.length)row[a.idx[k]]=a.val[k];out.push(row.map(v=>fmt(v).padStart(11)).join(' '));}$('matrix-grid').textContent=out.join('\n');}
+$('matrices').onclick=()=>{showMatrix();$('matrix-dialog').showModal();};$('matrix-choice').onchange=showMatrix;$('close-dialog').onclick=()=>$('matrix-dialog').close();mobile.addEventListener('change',layout);reduced.addEventListener('change',drawPacket);layout();window.PhotonicLoop={state,next,play,reset,finish,step:()=>{playing=false;cancelAnimationFrame(raf);progress=1;advance();progress=1;render();return state();}};
+})();
+</script></body></html>

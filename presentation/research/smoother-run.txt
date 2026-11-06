@@ -1,0 +1,21 @@
+/home/samarth/dev/multigrid-pde-solver/smoother.py:50: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.show()
+1
+1
+1
+1
+1
+[<Compressed Sparse Row sparse matrix of dtype 'float64'
+ 	with 46 stored elements and shape (16, 16)>
+ <Block Sparse Row sparse array of dtype 'float64'
+ 	with 16 stored elements (blocksize=1x1) and shape (6, 6)>
+ <Block Sparse Row sparse array of dtype 'float64'
+ 	with 4 stored elements (blocksize=1x1) and shape (2, 2)>]
+[94.14532872 88.28719723 82.42560554 76.56055363 70.69204152 64.8200692
+ 58.94463668 53.06574394 47.183391   41.29757785 35.4083045  29.51557093
+ 23.61937716 17.71972318 11.816609    5.9100346 ]
+Traceback (most recent call last):
+  File "/home/samarth/dev/multigrid-pde-solver/smoother.py", line 104, in <module>
+    r = b - A @ x
+            ~~^~~
+ValueError: matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 16 is different from 3)

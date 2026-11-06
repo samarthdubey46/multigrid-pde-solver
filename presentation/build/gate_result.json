@@ -1,0 +1,110 @@
+{
+  "passed": true,
+  "overall_score": 96,
+  "pptx_path": "presentation/build/photonic-pde-draft.pptx",
+  "checklist": {
+    "user_code_errors": 0,
+    "engine_bug_errors": 0,
+    "warnings": 19
+  },
+  "verdict": "PASS — 可进入 S5 交付",
+  "user_code_error_detail": [],
+  "engine_bug_detail": [],
+  "warnings_detail": [
+    {
+      "slide": 1,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~22%"
+    },
+    {
+      "slide": 4,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~26%"
+    },
+    {
+      "slide": 4,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~19%"
+    },
+    {
+      "slide": 5,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~17%"
+    },
+    {
+      "slide": 6,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~18%"
+    },
+    {
+      "slide": 7,
+      "category": "text_line_collision",
+      "message": "Text nearly touches separator line (gap: 0.019\")"
+    },
+    {
+      "slide": 9,
+      "category": "shape_overlap",
+      "message": "Two text shapes overlap by 47%"
+    },
+    {
+      "slide": 9,
+      "category": "shape_overlap",
+      "message": "Two text shapes overlap by 47%"
+    },
+    {
+      "slide": 10,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~28%"
+    },
+    {
+      "slide": 11,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~22%"
+    },
+    {
+      "slide": 11,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~19%"
+    },
+    {
+      "slide": 12,
+      "category": "text_line_collision",
+      "message": "Text nearly touches separator line (gap: 0.008\")"
+    },
+    {
+      "slide": 13,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~17%"
+    },
+    {
+      "slide": 13,
+      "category": "text_line_collision",
+      "message": "Text nearly touches separator line (gap: 0.009\")"
+    },
+    {
+      "slide": 19,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~26%"
+    },
+    {
+      "slide": 19,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~26%"
+    },
+    {
+      "slide": 21,
+      "category": "shape_overlap",
+      "message": "Two text shapes overlap by 20%"
+    },
+    {
+      "slide": 26,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~24%"
+    },
+    {
+      "slide": 30,
+      "category": "text_overflow",
+      "message": "Text likely overflows box by ~17%"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "council": {
+      "source": "tsenart/council-skill",
+      "sourceType": "github",
+      "skillPath": "skills/council/SKILL.md",
+      "computedHash": "79bd9507226cb683f0eb98899abc3b246401aaa6922789408b89f5e553cfdd29"
+    }
+  }
+}

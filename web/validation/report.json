@@ -1,0 +1,49 @@
+{
+  "baseline": {
+    "zero": {
+      "relativeResidual": 3.1704180357133085e-13,
+      "counts": {
+        "optical": 180,
+        "digital": 111,
+        "dac": 180,
+        "adc": 180,
+        "cycles": 10
+      }
+    },
+    "linear": {
+      "relativeResidual": 1.0770476404261172e-13,
+      "counts": {
+        "optical": 126,
+        "digital": 77,
+        "dac": 126,
+        "adc": 126,
+        "cycles": 7
+      }
+    },
+    "random": {
+      "relativeResidual": 1.5004271652813487e-14,
+      "counts": {
+        "optical": 198,
+        "digital": 123,
+        "dac": 198,
+        "adc": 198,
+        "cycles": 11
+      }
+    }
+  },
+  "checks": [
+    "keyboard focus and component / overview explanations do not advance solver",
+    "full-screen workspace enters/exits; initial x values visible",
+    "pause freezes beam and generator; resume, repeated Next and mid-operation restart",
+    "three optical levels and CPU-only 3×3 coarse solve",
+    "completion stops playback with success caption",
+    "downloaded HTML boots and solves offline",
+    "registered tools retain names, execution, read-only state and input validation",
+    "detection animates optical arrival before electrical return; finish cancels pending animation",
+    "manual Next, autoplay and finish identical for zero / linear / random",
+    "distinct numerical-error and iteration-limit captions stop playback (fault injection)",
+    "reduced motion uses static highlights",
+    "mobile screenshots and no horizontal overflow at 320–1440px, all details expanded",
+    "no browser JavaScript errors"
+  ]
+}

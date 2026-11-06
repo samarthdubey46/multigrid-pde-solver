@@ -1,0 +1,214 @@
+{
+  "slides": [
+    {
+      "idx": 1,
+      "title": "Photonic multigrid for Poisson problems",
+      "layout": "cover",
+      "appendix": false
+    },
+    {
+      "idx": 2,
+      "title": "The paper assigns smoothing products to optics",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 3,
+      "title": "Three implementations, different settings",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 4,
+      "title": "The unknown vector stores sampled solution values",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 5,
+      "title": "The residual becomes the next correction problem",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 6,
+      "title": "One solver map connects all four routines",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 7,
+      "title": "The CPU closes every optical smoothing loop",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 8,
+      "title": "A real smoothing request changes the local vector",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 9,
+      "title": "The multigrid V-cycle",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 10,
+      "title": "Smoothing and coarse correction",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 11,
+      "title": "PCG turns a V-cycle correction into a search step",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 12,
+      "title": "PCG stopping and direction updates",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 13,
+      "title": "Outer correction and true-residual checks",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 14,
+      "title": "The hierarchy is fixed while its vectors change",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 15,
+      "title": "Convergence of the ideal browser model",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 16,
+      "title": "The separate 2D noisy experiment",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 17,
+      "title": "Counted digital products in the 2D run",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 18,
+      "title": "Implemented behavior and open questions",
+      "layout": "side_by_side",
+      "appendix": false
+    },
+    {
+      "idx": 19,
+      "title": "Next validation: full computational cost",
+      "layout": "key_takeaway",
+      "appendix": false
+    },
+    {
+      "idx": 20,
+      "title": "Complete recurrence and termination conditions",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 21,
+      "title": "Recursive V-cycle and smoothing pseudocode",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 22,
+      "title": "Fine operators A\u2080 and A\u2081",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 23,
+      "title": "Coarse operators A\u2082 and A\u2083",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 24,
+      "title": "Transfer operators P\u2080 and R\u2080",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 25,
+      "title": "Transfer operators P\u2081 and R\u2081",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 26,
+      "title": "Transfer operators P\u2082 and R\u2082",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 27,
+      "title": "The 2D experiment uses four fixed sparse matrices",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 28,
+      "title": "The noisy smoother has a specific software model",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 29,
+      "title": "Settings and counter definitions",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 30,
+      "title": "Convergence theory and observed results",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 31,
+      "title": "Related work: Zhu\u2019s coherent processor",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 32,
+      "title": "The actual two-level cycle in main.py",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 33,
+      "title": "Setup constructs operators before iteration starts",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 34,
+      "title": "True residuals contract across noisy restarts",
+      "layout": "side_by_side",
+      "appendix": true
+    },
+    {
+      "idx": 35,
+      "title": "Sources and reproducibility",
+      "layout": "side_by_side",
+      "appendix": true
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "passed": true,
+  "total_slides": 35,
+  "verdict": "PASS — 可进入 S4 渲染",
+  "fail_items": [],
+  "pass_items": [
+    {
+      "slide_idx": 1,
+      "layout": "cover",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 2,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 3,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 4,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 5,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 6,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 7,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 8,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 9,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 10,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 11,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 12,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 13,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 14,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 15,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 16,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 17,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 18,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 19,
+      "layout": "key_takeaway",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 20,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 21,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 22,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 23,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 24,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 25,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 26,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 27,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 28,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 29,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 30,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 31,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 32,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 33,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 34,
+      "layout": "side_by_side",
+      "status": "ok"
+    },
+    {
+      "slide_idx": 35,
+      "layout": "side_by_side",
+      "status": "ok"
+    }
+  ]
+}

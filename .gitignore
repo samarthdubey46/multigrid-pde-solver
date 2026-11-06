@@ -1,0 +1,16 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.aws
+.aws/
+.codex/
+.idea/
+.junie/
+.aiassistant/
+.agents/
+.env
+.env.*
+node_modules/
+presentation/build/deps/
+*.log

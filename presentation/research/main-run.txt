@@ -1,0 +1,8 @@
+64x64 Poisson, 4096 unknowns
+
+solver                        float64  analog  ||r||/||b||
+plain CG                          148       0      7.8e-11
+multigrid CG                       60       0      6.1e-11
+multigrid CG, photonic             45      60      4.0e-11
+
+G = 3.3   (70% fewer float64 products)

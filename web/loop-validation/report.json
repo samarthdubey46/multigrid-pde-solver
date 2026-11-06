@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "checks": [
+    "embedded solver and data unchanged",
+    "all three numerical baselines",
+    "manual/autoplay/finish produce identical solution and counts",
+    "all four grid levels visited",
+    "component inspection does not advance",
+    "pause freezes animation and solver",
+    "restart clears state",
+    "all 10 matrices present",
+    "mobile no horizontal overflow",
+    "reduced motion",
+    "no browser errors"
+  ]
+}
